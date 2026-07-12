@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Redesigned the outbound mail center as a quieter control surface with a balanced sender identity strip, neutral summary cards, and a compact responsive sending-readiness panel.
+
 ## [0.2.8] - 2026-07-12
 
 ### Fixed
