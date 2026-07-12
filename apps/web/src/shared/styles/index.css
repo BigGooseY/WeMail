@@ -12318,11 +12318,18 @@ button:disabled {
   display: none;
 }
 
-.outbound-mailbox-trigger.ui-button:hover,
-.outbound-mailbox-trigger.ui-button:focus-visible {
+.outbound-mailbox-trigger.ui-button:hover {
   border-color: var(--border-strong);
   background: var(--surface-elevated);
   box-shadow: 0 6px 18px color-mix(in srgb, var(--shadow-color) 9%, transparent);
+}
+
+.outbound-mailbox-trigger.ui-button:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 72%, transparent);
+  outline-offset: 2px;
+  border-color: color-mix(in srgb, var(--accent) 52%, var(--border-strong));
+  background: var(--surface-elevated);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 16%, transparent);
 }
 
 .outbound-mailbox-trigger-icon,

@@ -59,6 +59,14 @@ describe("outbound styles", () => {
     expect(statCardHoverRule).not.toContain("transform: translateY");
   });
 
+  it("preserves a distinct keyboard focus ring on the outbound mailbox trigger", () => {
+    const focusRule = getRuleBody(".outbound-mailbox-trigger.ui-button:focus-visible");
+
+    expect(focusRule).toContain("outline: 2px solid color-mix(in srgb, var(--accent) 72%, transparent)");
+    expect(focusRule).toContain("outline-offset: 2px");
+    expect(focusRule).toContain("box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 16%, transparent)");
+  });
+
   it("keeps the readiness panel compact and collapses it in two responsive stages", () => {
     const readinessPanelRule = getRuleBody(".outbound-readiness-panel");
     const mediumContainer = getBlockBody(sharedStyles, "@container (max-width: 980px)");
