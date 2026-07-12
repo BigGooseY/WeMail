@@ -381,8 +381,9 @@ describe("outbound page integration", () => {
     expect(screen.getByText(/^发送总量$/i)).toBeInTheDocument();
     expect(screen.getByText(/^发送成功$/i)).toBeInTheDocument();
     expect(screen.getByText(/^发送失败$/i)).toBeInTheDocument();
-    const readinessPanel = screen.getByRole("region", { name: /^发信成熟度$/i });
+    const readinessPanel = screen.getByRole("region", { name: /^发信准备状态$/i });
     expect(await within(readinessPanel).findByRole("heading", { name: /^发信准备状态$/i })).toBeInTheDocument();
+    expect(within(readinessPanel).queryByText(/^发信成熟度$/i)).not.toBeInTheDocument();
     expect(within(readinessPanel).getByText(/^今日额度$/i)).toBeInTheDocument();
     expect(within(readinessPanel).getByRole("region", { name: /^发信身份检查$/i })).toBeInTheDocument();
     expect(within(readinessPanel).getByRole("region", { name: /^DNS 配置检查$/i })).toBeInTheDocument();

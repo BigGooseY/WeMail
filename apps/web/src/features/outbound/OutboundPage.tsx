@@ -517,12 +517,9 @@ export function OutboundPage({
             </div>
           </div>
 
-          <section className="outbound-readiness-panel" aria-label="发信成熟度">
+          <section className="outbound-readiness-panel" aria-label="发信准备状态">
             <div className="outbound-readiness-header">
-              <div>
-                <p className="panel-kicker">发信成熟度</p>
-                <h2>发信准备状态</h2>
-              </div>
+              <h2>发信准备状态</h2>
               <span className="outbound-readiness-status" data-status={outboundMaturityStatus}>
                 {isLoadingMaturity ? "检查中" : getReadinessStatusLabel(outboundMaturityStatus)}
               </span>
