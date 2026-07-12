@@ -159,6 +159,11 @@ function getStatusLabel(status: SystemDiagnosticStatus) {
   return "待核对";
 }
 
+function getReadinessStatusLabel(status: SystemDiagnosticStatus) {
+  if (status === "ok") return "已就绪";
+  return getStatusLabel(status);
+}
+
 function getOutboundMaturityStatus(summary: OutboundMaturitySummary): SystemDiagnosticStatus {
   if (!summary.featureEnabled || !summary.resendConfigured) return "warning";
   if (summary.identities.some((identity) => identity.status === "error")) return "error";
@@ -506,9 +511,9 @@ export function OutboundPage({
             </div>
 
             <div className="outbound-stat-grid" aria-label="发件箱概览">
-              <StatCard detail="真实记录" icon={Inbox} label="发送总量" tone="neutral" value={totalCount} />
+              <StatCard detail="全部记录" icon={Inbox} label="发送总量" tone="neutral" value={totalCount} />
               <StatCard detail={`成功率 ${successRate}`} icon={CheckCircle2} label="发送成功" tone="success" value={sentCount} />
-              <StatCard detail="可直接补发" icon={XCircle} label="发送失败" tone="danger" value={failedCount} />
+              <StatCard detail="失败记录" icon={XCircle} label="发送失败" tone="danger" value={failedCount} />
             </div>
           </div>
 
@@ -516,10 +521,10 @@ export function OutboundPage({
             <div className="outbound-readiness-header">
               <div>
                 <p className="panel-kicker">发信成熟度</p>
-                <h2>身份、DNS 与模板</h2>
+                <h2>发信准备状态</h2>
               </div>
               <span className="outbound-readiness-status" data-status={outboundMaturityStatus}>
-                {isLoadingMaturity ? "检查中" : getStatusLabel(outboundMaturityStatus)}
+                {isLoadingMaturity ? "检查中" : getReadinessStatusLabel(outboundMaturityStatus)}
               </span>
             </div>
 
