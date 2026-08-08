@@ -1,16 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
-  AlertTriangle,
   Check,
   CheckCircle2,
   ChevronDown,
   ClipboardCopy,
   FileJson,
-  FileText,
   Gauge,
   Inbox,
-  Network,
   RefreshCw,
   Repeat2,
   SearchX,
@@ -25,11 +22,10 @@ import type {
   MailSettingsWorkspaceDefaults,
   OutboundListStatus,
   OutboundMaturitySummary,
-  OutboundTemplateSummary,
   SystemDiagnosticStatus
 } from "@wemail/shared";
 
-import { Button } from "../../shared/button";
+import { Button, ButtonLink } from "../../shared/button";
 import { EmptyState } from "../../shared/empty-state";
 import { FilterBar } from "../../shared/filter-bar";
 import { FormField, SearchInput } from "../../shared/form";
@@ -38,8 +34,8 @@ import { Page, PageBody, PageHeader, PageMain, PageSidebar, PageToolbar } from "
 import { Pagination } from "../../shared/pagination";
 import { Tabs, TabsList, TabsTrigger } from "../../shared/tabs";
 import type { OutboundHistoryDetail, OutboundHistoryItem, OutboundHistorySummary } from "../inbox/types";
-import { fetchOutboundMaturity, type OutboundListQueryInput } from "../inbox/api";
-import { fetchMailSettings } from "../settings/api";
+import type { OutboundListQueryInput } from "../inbox/api";
+import { fetchMailSettings, fetchOutboundMaturity } from "../settings/api";
 import { OutboundComposeDrawer } from "./OutboundComposeDrawer";
 
 type OutboundFilter = "all" | "sent" | "failed";
@@ -159,6 +155,11 @@ function getStatusLabel(status: SystemDiagnosticStatus) {
   return "待核对";
 }
 
+function getReadinessStatusLabel(status: SystemDiagnosticStatus) {
+  if (status === "ok") return "已就绪";
+  return getStatusLabel(status);
+}
+
 function getOutboundMaturityStatus(summary: OutboundMaturitySummary): SystemDiagnosticStatus {
   if (!summary.featureEnabled || !summary.resendConfigured) return "warning";
   if (summary.identities.some((identity) => identity.status === "error")) return "error";
@@ -249,7 +250,7 @@ export function OutboundPage({
   onSelectMailbox,
   onSendMail
 }: OutboundPageProps) {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchValue, setSearchValue] = useState("");
   const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null);
   const [filter, setFilter] = useState<OutboundFilter>(() => getFilterFromSearchParams(searchParams));
@@ -388,13 +389,26 @@ export function OutboundPage({
     setIsComposeOpen(true);
   }
 
-  function openTemplateComposeDrawer(template: OutboundTemplateSummary) {
+  const openTemplateComposeDrawer = useCallback((template: OutboundMaturitySummary["templates"][number]) => {
     setComposeDraft({
       subject: template.subject,
       bodyText: template.bodyText
     });
     setIsComposeOpen(true);
-  }
+  }, []);
+
+  useEffect(() => {
+    const templateId = searchParams.get("template");
+    if (!templateId || !outboundMaturity) return;
+
+    const template = outboundMaturity.templates.find((candidate) => candidate.id === templateId);
+    if (!template) return;
+
+    openTemplateComposeDrawer(template);
+    const nextSearchParams = new URLSearchParams(searchParams);
+    nextSearchParams.delete("template");
+    setSearchParams(nextSearchParams, { replace: true });
+  }, [openTemplateComposeDrawer, outboundMaturity, searchParams, setSearchParams]);
 
   async function handleSendMail(event: FormEvent<HTMLFormElement>) {
     await onSendMail(event);
@@ -460,7 +474,7 @@ export function OutboundPage({
   return (
     <>
       <Page as="main" className="workspace-grid outbound-page-grid">
-        <section className="panel workspace-card outbound-toolbar-card">
+        <section className="panel workspace-card page-panel outbound-toolbar-card">
           <PageHeader
             actions={
               <div className="workspace-topbar-actions outbound-toolbar-actions">
@@ -478,10 +492,10 @@ export function OutboundPage({
               </div>
             }
             className="outbound-page-header outbound-page-header-compact"
+            description="查看投递结果、定位失败原因，并从当前发件身份开始下一封邮件。"
             kicker="邮件中心"
-          >
-            <h1 className="sr-only">发件箱</h1>
-          </PageHeader>
+            title="发件箱"
+          />
 
           <div className="outbound-command-strip">
             <div className="outbound-mailbox-control">
@@ -506,21 +520,26 @@ export function OutboundPage({
             </div>
 
             <div className="outbound-stat-grid" aria-label="发件箱概览">
-              <StatCard detail="真实记录" icon={Inbox} label="发送总量" tone="neutral" value={totalCount} />
+              <StatCard detail="全部记录" icon={Inbox} label="发送总量" tone="neutral" value={totalCount} />
               <StatCard detail={`成功率 ${successRate}`} icon={CheckCircle2} label="发送成功" tone="success" value={sentCount} />
-              <StatCard detail="可直接补发" icon={XCircle} label="发送失败" tone="danger" value={failedCount} />
+              <StatCard detail="失败记录" icon={XCircle} label="发送失败" tone="danger" value={failedCount} />
             </div>
           </div>
 
-          <section className="outbound-readiness-panel" aria-label="发信成熟度">
+          <section className="outbound-readiness-panel" aria-label="发信准备状态">
             <div className="outbound-readiness-header">
               <div>
-                <p className="panel-kicker">发信成熟度</p>
-                <h2>身份、DNS 与模板</h2>
+                <p className="panel-kicker">投递航线</p>
+                <h2>发信准备状态</h2>
               </div>
-              <span className="outbound-readiness-status" data-status={outboundMaturityStatus}>
-                {isLoadingMaturity ? "检查中" : getStatusLabel(outboundMaturityStatus)}
-              </span>
+              <div className="outbound-readiness-actions">
+                <span className="outbound-readiness-status" data-status={outboundMaturityStatus}>
+                  {isLoadingMaturity ? "检查中" : getReadinessStatusLabel(outboundMaturityStatus)}
+                </span>
+                <ButtonLink to="/mail/settings" variant="text">
+                  查看身份与模板
+                </ButtonLink>
+              </div>
             </div>
 
             {outboundMaturityError ? (
@@ -552,58 +571,9 @@ export function OutboundPage({
                   </div>
                 </div>
 
-                <div className="outbound-readiness-columns">
-                  <section className="outbound-check-list" aria-label="发信身份检查">
-                    <div className="outbound-check-list-header">
-                      <Send size={16} strokeWidth={1.9} aria-hidden="true" />
-                      <strong>发信身份</strong>
-                    </div>
-                    {outboundMaturity.identities.slice(0, 3).map((identity) => (
-                      <div className="outbound-check-row" data-status={identity.status} key={identity.id}>
-                        <span>{identity.isDefault ? "默认" : identity.label}</span>
-                        <small>{identity.address}</small>
-                      </div>
-                    ))}
-                  </section>
-
-                  <section className="outbound-check-list" aria-label="DNS 配置检查">
-                    <div className="outbound-check-list-header">
-                      <Network size={16} strokeWidth={1.9} aria-hidden="true" />
-                      <strong>DNS 检查</strong>
-                    </div>
-                    {outboundMaturity.dnsChecks.map((check) => (
-                      <div className="outbound-check-row" data-status={check.status} key={check.id}>
-                        <span>{check.label}</span>
-                        <small>{check.recordType} · {check.domain}</small>
-                      </div>
-                    ))}
-                  </section>
-
-                  <section className="outbound-check-list outbound-template-list" aria-label="发信模板">
-                    <div className="outbound-check-list-header">
-                      <FileText size={16} strokeWidth={1.9} aria-hidden="true" />
-                      <strong>模板</strong>
-                    </div>
-                    {outboundMaturity.templates.map((template) => (
-                      <Button
-                        className="outbound-template-button"
-                        contentLayout="plain"
-                        key={template.id}
-                        onClick={() => openTemplateComposeDrawer(template)}
-                        variant="text"
-                      >
-                        <span>{template.name}</span>
-                        <small>{template.description}</small>
-                      </Button>
-                    ))}
-                  </section>
-                </div>
               </>
             ) : (
-              <div className="outbound-readiness-loading">
-                <AlertTriangle size={17} strokeWidth={1.9} aria-hidden="true" />
-                <span>{isLoadingMaturity ? "正在读取发信成熟度检查" : "暂无发信成熟度数据"}</span>
-              </div>
+              <p className="outbound-readiness-loading">{isLoadingMaturity ? "正在读取发信运行状态" : "暂无发信运行状态"}</p>
             )}
           </section>
 

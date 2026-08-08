@@ -362,6 +362,23 @@ describe("UsersGlobalSettingsPage", () => {
     expect(within(commercialPanel).queryByLabelText("组织级审计")).not.toBeInTheDocument();
   });
 
+  it("keeps the settings page usable when the commercial summary fails", () => {
+    const onRetryCommercial = vi.fn();
+    renderUsersGlobalSettings({
+      adminCommercial: null,
+      adminCommercialError: "商业化数据暂时不可用，其他用户设置仍可使用。",
+      onRetryCommercial
+    });
+
+    expect(screen.getByRole("region", { name: "用户设置概览" })).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "邀请流程" })).toBeInTheDocument();
+    const commercialPanel = screen.getByRole("region", { name: "商业与团队模型" });
+    expect(within(commercialPanel).getByRole("alert")).toHaveTextContent("商业化摘要暂时没有返回");
+
+    fireEvent.click(within(commercialPanel).getByRole("button", { name: "重试" }));
+    expect(onRetryCommercial).toHaveBeenCalledTimes(1);
+  });
+
   it("keeps the invite and quota controls wired to callbacks", async () => {
     const onCreateInvite = vi.fn();
     const onDisableInvite = vi.fn();

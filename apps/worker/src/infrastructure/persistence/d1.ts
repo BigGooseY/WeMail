@@ -26,6 +26,8 @@ import type {
   OAuthProviderId,
   OAuthStateRecord,
   OutboundMessageRecord,
+  OutboundMessageUsageQuery,
+  OutboundMessageUsageSummary,
   PersistedMessageRecord,
   QuotaRecord,
   RuntimeSettingsRecord,
@@ -1229,6 +1231,44 @@ export function createD1Store(db: D1Database): AppStore {
             failedCount: Number(summaryRow?.failed_count ?? 0)
           },
           total: Number(totalRow?.count ?? 0)
+        };
+      },
+      async summarizeByMailboxes(query: OutboundMessageUsageQuery): Promise<OutboundMessageUsageSummary> {
+        const mailboxIds = Array.from(new Set(query.mailboxIds)).filter(Boolean);
+        if (mailboxIds.length === 0) {
+          return {
+            totalCount: 0,
+            sentCount: 0,
+            failedCount: 0,
+            sentSinceCount: 0
+          };
+        }
+
+        const sentSinceExpression = query.sinceIso
+          ? "COALESCE(SUM(CASE WHEN status = 'sent' AND created_at >= ? THEN 1 ELSE 0 END), 0)"
+          : "COALESCE(SUM(CASE WHEN status = 'sent' THEN 1 ELSE 0 END), 0)";
+        const bindings: unknown[] = query.sinceIso
+          ? [query.sinceIso, JSON.stringify(mailboxIds)]
+          : [JSON.stringify(mailboxIds)];
+        // Admin summaries only need counts; materializing outbound bodies makes this request grow with mailbox history.
+        const row = await db
+          .prepare(
+            `SELECT
+              COUNT(*) AS total_count,
+              COALESCE(SUM(CASE WHEN status = 'sent' THEN 1 ELSE 0 END), 0) AS sent_count,
+              COALESCE(SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END), 0) AS failed_count,
+              ${sentSinceExpression} AS sent_since_count
+            FROM mail_outbound_messages
+            WHERE account_id IN (SELECT value FROM json_each(?))`
+          )
+          .bind(...bindings)
+          .first<{ total_count: number; sent_count: number; failed_count: number; sent_since_count: number }>();
+
+        return {
+          totalCount: Number(row?.total_count ?? 0),
+          sentCount: Number(row?.sent_count ?? 0),
+          failedCount: Number(row?.failed_count ?? 0),
+          sentSinceCount: Number(row?.sent_since_count ?? 0)
         };
       },
       async findById(id) {

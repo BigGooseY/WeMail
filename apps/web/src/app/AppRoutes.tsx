@@ -188,6 +188,8 @@ type AppRoutesProps = {
     adminMailboxesTotal: number;
     adminGovernance: AdminGovernanceSummary | null;
     adminCommercial: CommercialModelSummary | null;
+    adminCommercialError: string | null;
+    isLoadingCommercial: boolean;
     createUser: (payload: { email: string; name: string; password: string; role: UserRole }) => Promise<void>;
     changeUserRoles: (userIds: string[], role: UserRole) => Promise<void>;
     updateUser: (userId: string, payload: { name: string }) => Promise<void>;
@@ -202,6 +204,7 @@ type AppRoutesProps = {
     createInvite: (payload: InviteCreatePayload) => Promise<void>;
     disableInvite: (inviteId: string) => Promise<void>;
     refreshAdminInvites: (query: { page: number; pageSize: number }) => Promise<void>;
+    refreshAdminCommercial: () => Promise<void>;
     selectQuotaUser: (userId: string) => Promise<void>;
     submitQuota: (event: FormEvent<HTMLFormElement>, userId: string) => Promise<void>;
     toggleFeatures: (nextFeatureToggles: FeatureToggles) => Promise<void>;
@@ -394,6 +397,8 @@ export function AppRoutes({
         adminMailboxesTotal={admin.adminMailboxesTotal}
         adminGovernance={admin.adminGovernance}
         adminCommercial={admin.adminCommercial}
+        adminCommercialError={admin.adminCommercialError}
+        isLoadingCommercial={admin.isLoadingCommercial}
         adminQuota={admin.adminQuota}
         adminSettingsUsers={admin.adminSettingsUsers}
         adminSettingsUsersPage={admin.adminSettingsUsersPage}
@@ -408,6 +413,7 @@ export function AppRoutes({
         onQuotaUsersPageChange={(page) => admin.refreshAdminSettingsSummary({ page, pageSize: admin.adminSettingsUsersPageSize })}
         onSelectQuotaUser={admin.selectQuotaUser}
         onSubmitQuota={admin.submitQuota}
+        onRetryCommercial={() => void admin.refreshAdminCommercial()}
       />
     );
 

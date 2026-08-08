@@ -38,6 +38,7 @@ const DEFAULT_ADMIN_USERS_QUERY: AdminUsersQuery = {
 };
 
 const USERS_LOAD_ERROR = "用户列表加载失败，请稍后重试。";
+const COMMERCIAL_LOAD_ERROR = "商业化数据暂时不可用，其他用户设置仍可使用。";
 const DEFAULT_ADMIN_SETTINGS_QUERY: AdminSettingsListQuery = {
   page: 1,
   pageSize: ADMIN_SETTINGS_PAGE_SIZE
@@ -76,7 +77,9 @@ export function useAdminData({ session, onToast }: UseAdminDataOptions) {
   const setAdminQuota = useAppStore((state) => state.setAdminQuota);
   const setAdminFeatures = useAppStore((state) => state.setAdminFeatures);
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+  const [isLoadingCommercial, setIsLoadingCommercial] = useState(false);
   const [usersError, setUsersError] = useState<string | null>(null);
+  const [adminCommercialError, setAdminCommercialError] = useState<string | null>(null);
   const [adminGovernance, setAdminGovernance] = useState<AdminGovernanceSummary | null>(null);
   const [adminCommercial, setAdminCommercial] = useState<CommercialModelSummary | null>(null);
   const lastUsersQuery = useRef<AdminUsersQuery>(DEFAULT_ADMIN_USERS_QUERY);
@@ -102,22 +105,6 @@ export function useAdminData({ session, onToast }: UseAdminDataOptions) {
     [session, setAdminUsers]
   );
 
-  const refreshAdminData = useCallback(async () => {
-    if (session?.user.role !== "admin") return;
-    setIsLoadingUsers(true);
-    setUsersError(null);
-    try {
-      const dashboard = await queryAdminDashboard();
-      setAdminDashboard(dashboard);
-      setAdminGovernance(dashboard.governance);
-      setAdminCommercial(dashboard.commercial);
-    } catch {
-      setUsersError(USERS_LOAD_ERROR);
-    } finally {
-      setIsLoadingUsers(false);
-    }
-  }, [session, setAdminDashboard]);
-
   const refreshAdminGovernance = useCallback(async () => {
     if (session?.user.role !== "admin") return;
     setAdminGovernance(await queryAdminGovernance());
@@ -125,8 +112,33 @@ export function useAdminData({ session, onToast }: UseAdminDataOptions) {
 
   const refreshAdminCommercial = useCallback(async () => {
     if (session?.user.role !== "admin") return;
-    setAdminCommercial(await queryAdminCommercial());
+    setIsLoadingCommercial(true);
+    setAdminCommercialError(null);
+    try {
+      setAdminCommercial(await queryAdminCommercial());
+    } catch {
+      setAdminCommercial(null);
+      setAdminCommercialError(COMMERCIAL_LOAD_ERROR);
+    } finally {
+      setIsLoadingCommercial(false);
+    }
   }, [session]);
+
+  const refreshAdminData = useCallback(async () => {
+    if (session?.user.role !== "admin") return;
+    setIsLoadingUsers(true);
+    setUsersError(null);
+    void refreshAdminCommercial();
+    try {
+      const dashboard = await queryAdminDashboard();
+      setAdminDashboard(dashboard);
+      setAdminGovernance(dashboard.governance);
+    } catch {
+      setUsersError(USERS_LOAD_ERROR);
+    } finally {
+      setIsLoadingUsers(false);
+    }
+  }, [refreshAdminCommercial, session, setAdminDashboard]);
 
   const refreshAdminSettingsSummary = useCallback(async (query: AdminSettingsListQuery = lastSettingsUsersQuery.current) => {
     if (session?.user.role !== "admin") return;
@@ -290,11 +302,14 @@ export function useAdminData({ session, onToast }: UseAdminDataOptions) {
     adminMailboxesTotal,
     adminGovernance,
     adminCommercial,
+    adminCommercialError,
+    isLoadingCommercial,
     refreshAdminData,
     refreshAdminUsers,
     refreshAdminSettingsSummary,
     refreshAdminInvites,
     refreshAdminMailboxes,
+    refreshAdminCommercial,
     isLoadingUsers,
     usersError,
     createUser,

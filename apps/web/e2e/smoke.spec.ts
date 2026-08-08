@@ -294,9 +294,9 @@ test("shows the mail settings rule center on its direct route for an authenticat
   await page.goto("/mail/settings");
   await expect(page.getByRole("heading", { name: /^邮件设置$/i })).toBeVisible();
   await expect(page.getByRole("heading", { name: /^发件规则$/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /^发信身份与模板$/i })).toBeVisible();
   await expect(page.getByRole("heading", { name: /^通知与路由$/i })).toBeVisible();
   await expect(page.getByRole("heading", { name: /^工作台行为偏好$/i })).toBeVisible();
-  await expect(page.getByRole("heading", { name: /^当前策略摘要$/i })).toBeVisible();
   await expect(page.getByRole("button", { name: /^保存发件规则$/i })).toBeVisible();
 });
 
@@ -386,6 +386,68 @@ test("shows the admin users workspace for an authenticated admin", async ({ page
       }
     })
   );
+  await page.route("**/api/users/commercial", async (route) =>
+    route.fulfill({
+      json: {
+        commercial: {
+          generatedAt: "2026-08-08T00:00:00.000Z",
+          currentPlanId: "team",
+          planTiers: [
+            {
+              id: "free",
+              name: "免费版",
+              priceLabel: "¥0",
+              mailboxLimit: 5,
+              retentionDays: 7,
+              apiDailyLimit: 20000,
+              outboundDailyLimit: 20,
+              webhookLimit: 1,
+              teamSeats: 1,
+              features: ["基础收件"]
+            },
+            {
+              id: "pro",
+              name: "高级版",
+              priceLabel: "按月订阅",
+              mailboxLimit: 20,
+              retentionDays: 30,
+              apiDailyLimit: 100000,
+              outboundDailyLimit: 100,
+              webhookLimit: 10,
+              teamSeats: 3,
+              features: ["更高配额"]
+            },
+            {
+              id: "team",
+              name: "团队版",
+              priceLabel: "联系销售",
+              mailboxLimit: 100,
+              retentionDays: 90,
+              apiDailyLimit: 400000,
+              outboundDailyLimit: 400,
+              webhookLimit: 50,
+              teamSeats: 25,
+              features: ["团队空间"]
+            }
+          ],
+          quotaUsage: {
+            users: 2,
+            activeUsers: 2,
+            mailboxes: 1,
+            mailboxLimit: 100,
+            messages: 0,
+            outboundDailyLimit: 400,
+            outboundSentToday: 0,
+            apiDailyLimit: 400000,
+            apiCallsToday: 0,
+            webhookEndpoints: 0
+          },
+          teamWorkspaces: [],
+          organizationAudit: []
+        }
+      }
+    })
+  );
   await page.route("**/api/users/invites?**", async (route) =>
     route.fulfill({
       json: {
@@ -463,11 +525,11 @@ test("shows the admin users workspace for an authenticated admin", async ({ page
   await expect(sidebar).toBeVisible();
   await expect(sidebar.getByRole("link", { name: /^用户(?:\s|$)/i })).toBeVisible();
   await expect(page.getByRole("navigation", { name: /用户 二级菜单/i })).toBeVisible();
-  await expect(page.getByRole("heading", { name: /邀请与入场/i })).toBeVisible();
-  await expect(page.getByRole("heading", { name: /配额策略/i })).toBeVisible();
-  await expect(page.getByRole("heading", { name: /邮箱监管/i })).toBeVisible();
+  await expect(page.getByRole("region", { name: /^邀请流程$/i })).toBeVisible();
+  await expect(page.getByRole("region", { name: /^商业与团队模型$/i })).toBeVisible();
+  await expect(page.getByRole("region", { name: /^配额限制$/i })).toBeVisible();
+  await expect(page.getByRole("region", { name: /^安全治理$/i })).toBeVisible();
   await expect(page.getByLabel(/工作台品牌/i)).toContainText("WeMail");
-  await expect(page.getByText(/ops@example.com/i)).toBeVisible();
 });
 
 test("shows the admin dashboard mock board for an authenticated admin", async ({ page }) => {

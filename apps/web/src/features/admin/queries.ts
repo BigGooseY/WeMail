@@ -31,14 +31,13 @@ export async function queryAdminUsers(query: AdminUsersQuery) {
 }
 
 export async function queryAdminDashboard(query?: AdminUsersQuery) {
-  const [usersPayload, summaryPayload, invitesPayload, featuresPayload, mailboxesPayload, governancePayload, commercialPayload] = await Promise.all([
+  const [usersPayload, summaryPayload, invitesPayload, featuresPayload, mailboxesPayload, governancePayload] = await Promise.all([
     fetchAdminUsers(query),
     fetchAdminUserSummary(DEFAULT_ADMIN_SETTINGS_QUERY),
     fetchAdminInvites(DEFAULT_ADMIN_SETTINGS_QUERY),
     fetchAdminFeatures(),
     fetchAdminMailboxes(DEFAULT_ADMIN_SETTINGS_QUERY),
-    fetchAdminGovernance(),
-    fetchAdminCommercial()
+    fetchAdminGovernance()
   ]);
 
   const settingsUsers = summaryPayload.quotaUsers ?? usersPayload.users;
@@ -74,7 +73,7 @@ export async function queryAdminDashboard(query?: AdminUsersQuery) {
     mailboxesTotal: mailboxesPayload.total ?? mailboxes.length,
     quota: (quotaPayload?.quota ?? null) as QuotaSummary | null,
     governance: (governancePayload.governance ?? null) as AdminGovernanceSummary | null,
-    commercial: (commercialPayload.commercial ?? null) as CommercialModelSummary | null
+    commercial: null as CommercialModelSummary | null
   };
 }
 

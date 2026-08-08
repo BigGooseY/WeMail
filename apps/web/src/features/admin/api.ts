@@ -46,8 +46,19 @@ export function fetchAdminGovernance() {
   return apiFetch<{ governance: AdminGovernanceSummary }>("/api/users/governance");
 }
 
+export const ADMIN_COMMERCIAL_REQUEST_TIMEOUT_MS = 10_000;
+
 export function fetchAdminCommercial() {
-  return apiFetch<{ commercial: CommercialModelSummary }>("/api/users/commercial");
+  if (typeof AbortController === "undefined") {
+    return apiFetch<{ commercial: CommercialModelSummary }>("/api/users/commercial");
+  }
+
+  const controller = new AbortController();
+  // Commercial data is supplemental to the settings page, so a stalled Worker request must not leave the panel pending forever.
+  const timeoutId = setTimeout(() => controller.abort(), ADMIN_COMMERCIAL_REQUEST_TIMEOUT_MS);
+  return apiFetch<{ commercial: CommercialModelSummary }>("/api/users/commercial", {
+    signal: controller.signal
+  }).finally(() => clearTimeout(timeoutId));
 }
 
 export function createAdminUser(payload: { email: string; name: string; password: string; role: UserRole }) {

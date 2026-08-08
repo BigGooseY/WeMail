@@ -146,6 +146,9 @@ CREATE TABLE IF NOT EXISTS mail_outbound_messages (
   created_at TEXT NOT NULL
 );
 
+CREATE INDEX IF NOT EXISTS idx_mail_outbound_messages_account_status_created
+  ON mail_outbound_messages (account_id, status, created_at DESC);
+
 CREATE TABLE IF NOT EXISTS mail_settings (
   id TEXT PRIMARY KEY,
   sender_rules_json TEXT NOT NULL,

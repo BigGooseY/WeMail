@@ -1,11 +1,16 @@
-import { Building2, Gauge, ShieldCheck, Users } from "lucide-react";
+import { AlertTriangle, Building2, Gauge, RefreshCw, ShieldCheck, Users } from "lucide-react";
 
 import type { CommercialModelSummary, PlanTierSummary } from "@wemail/shared";
 
 import { Badge } from "../../shared/badge";
+import { Button } from "../../shared/button";
+import { LoadingState } from "../../shared/spinner";
 
 type CommercialModelPanelProps = {
   commercial: CommercialModelSummary | null;
+  errorMessage?: string | null;
+  isLoading?: boolean;
+  onRetry?: () => void;
 };
 
 function formatPlanName(planId: PlanTierSummary["id"]) {
@@ -14,19 +19,32 @@ function formatPlanName(planId: PlanTierSummary["id"]) {
   return "免费版";
 }
 
-export function CommercialModelPanel({ commercial }: CommercialModelPanelProps) {
+export function CommercialModelPanel({ commercial, errorMessage = null, isLoading = false, onRetry }: CommercialModelPanelProps) {
+  const statusLabel = errorMessage ? "暂不可用" : commercial ? formatPlanName(commercial.currentPlanId) : "加载中";
+
   return (
     <section aria-label="商业与团队模型" className="panel workspace-card users-settings-panel users-commercial-panel">
       <div className="users-settings-panel-head">
         <div>
           <p className="panel-kicker">商业化</p>
         </div>
-        <Badge variant={commercial?.currentPlanId === "team" ? "brand" : "info"}>
-          {commercial ? formatPlanName(commercial.currentPlanId) : "加载中"}
-        </Badge>
+        <Badge variant={errorMessage ? "warning" : commercial?.currentPlanId === "team" ? "brand" : "info"}>{statusLabel}</Badge>
       </div>
 
-      {commercial ? (
+      {errorMessage ? (
+        <div className="users-commercial-error" role="alert">
+          <AlertTriangle aria-hidden="true" size={18} strokeWidth={1.8} />
+          <div>
+            <strong>商业化摘要暂时没有返回</strong>
+            <p>{errorMessage}</p>
+          </div>
+          {onRetry ? (
+            <Button leadingIcon={<RefreshCw aria-hidden="true" size={15} />} onClick={onRetry} size="sm" variant="secondary">
+              重试
+            </Button>
+          ) : null}
+        </div>
+      ) : commercial ? (
         <>
           <div className="users-commercial-usage-grid" aria-label="组织级用量">
             <div>
@@ -70,8 +88,10 @@ export function CommercialModelPanel({ commercial }: CommercialModelPanelProps) 
             ))}
           </div>
         </>
+      ) : isLoading ? (
+        <LoadingState className="users-commercial-loading" label="正在加载套餐和组织级用量" size="sm" />
       ) : (
-        <p className="empty-state">正在加载套餐和组织级用量。</p>
+        <p className="empty-state">套餐和组织级用量尚未加载。</p>
       )}
     </section>
   );

@@ -28,6 +28,8 @@ type UsersGlobalSettingsPageProps = {
   adminMailboxesTotal?: number;
   adminGovernance?: AdminGovernanceSummary | null;
   adminCommercial?: CommercialModelSummary | null;
+  adminCommercialError?: string | null;
+  isLoadingCommercial?: boolean;
   onCreateInvite: (payload: InviteCreatePayload) => Promise<void>;
   onDisableInvite: (inviteId: string) => Promise<void>;
   onInvitePageChange?: (page: number) => Promise<void>;
@@ -35,6 +37,7 @@ type UsersGlobalSettingsPageProps = {
   onQuotaUsersPageChange?: (page: number) => Promise<void>;
   onSelectQuotaUser: (userId: string) => Promise<void>;
   onSubmitQuota: (event: FormEvent<HTMLFormElement>, userId: string) => Promise<void>;
+  onRetryCommercial?: () => void;
 };
 
 function isInviteAvailable(invite: InviteSummary) {
@@ -60,13 +63,16 @@ export function UsersGlobalSettingsPage({
   adminMailboxesTotal,
   adminGovernance = null,
   adminCommercial = null,
+  adminCommercialError = null,
+  isLoadingCommercial = false,
   onCreateInvite,
   onDisableInvite,
   onInvitePageChange,
   onInvitePageSizeChange,
   onQuotaUsersPageChange,
   onSelectQuotaUser,
-  onSubmitQuota
+  onSubmitQuota,
+  onRetryCommercial
 }: UsersGlobalSettingsPageProps) {
   const settingsUsers = adminSettingsUsers ?? adminUsers;
   const inviteDisplayUsers = adminSettingsUsers ? [...adminUsers, ...adminSettingsUsers] : adminUsers;
@@ -119,7 +125,12 @@ export function UsersGlobalSettingsPage({
             onInvitePageChange={onInvitePageChange}
             onInvitePageSizeChange={onInvitePageSizeChange}
           />
-          <CommercialModelPanel commercial={adminCommercial} />
+          <CommercialModelPanel
+            commercial={adminCommercial}
+            errorMessage={adminCommercialError}
+            isLoading={isLoadingCommercial}
+            onRetry={onRetryCommercial}
+          />
           <QuotaPanel
             adminUsers={settingsUsers}
             adminQuota={adminQuota}

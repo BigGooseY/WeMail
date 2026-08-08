@@ -32,6 +32,8 @@ import type {
   OAuthPendingLoginRecord,
   OAuthStateRecord,
   OutboundMessageRecord,
+  OutboundMessageUsageQuery,
+  OutboundMessageUsageSummary,
   PersistedMessageRecord,
   QuotaRecord,
   RuntimeSettingsRecord,
@@ -824,6 +826,20 @@ export function createInMemoryStore(): AppStore {
           },
           total: filteredMessages.length
         });
+      },
+      async summarizeByMailboxes(query: OutboundMessageUsageQuery): Promise<OutboundMessageUsageSummary> {
+        const mailboxIds = new Set(query.mailboxIds);
+        const scopedMessages = outboundMessages.filter((entry) => mailboxIds.has(entry.mailboxId));
+        const sentSinceCount = scopedMessages.filter(
+          (entry) => entry.status === "sent" && (!query.sinceIso || entry.createdAt >= query.sinceIso)
+        ).length;
+
+        return {
+          totalCount: scopedMessages.length,
+          sentCount: scopedMessages.filter((entry) => entry.status === "sent").length,
+          failedCount: scopedMessages.filter((entry) => entry.status === "failed").length,
+          sentSinceCount
+        };
       },
       async findById(id) {
         return clone(outboundMessages.find((entry) => entry.id === id) ?? null);

@@ -381,10 +381,15 @@ describe("outbound page integration", () => {
     expect(screen.getByText(/^发送总量$/i)).toBeInTheDocument();
     expect(screen.getByText(/^发送成功$/i)).toBeInTheDocument();
     expect(screen.getByText(/^发送失败$/i)).toBeInTheDocument();
-    expect(await within(screen.getByRole("region", { name: /^发信成熟度$/i })).findByText(/^身份、DNS 与模板$/i)).toBeInTheDocument();
-    expect(screen.getByText(/^今日额度$/i)).toBeInTheDocument();
-    expect(screen.getByText(/^DNS 检查$/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /验证码转发/i })).toBeInTheDocument();
+    const readinessPanel = screen.getByRole("region", { name: /^发信准备状态$/i });
+    expect(await within(readinessPanel).findByRole("heading", { name: /^发信准备状态$/i })).toBeInTheDocument();
+    expect(within(readinessPanel).getByText(/^投递航线$/i)).toBeInTheDocument();
+    expect(within(readinessPanel).queryByText(/^发信成熟度$/i)).not.toBeInTheDocument();
+    expect(within(readinessPanel).getByText(/^今日额度$/i)).toBeInTheDocument();
+    expect(within(readinessPanel).queryByRole("region", { name: /^发信身份检查$/i })).not.toBeInTheDocument();
+    expect(within(readinessPanel).queryByRole("region", { name: /^DNS 配置检查$/i })).not.toBeInTheDocument();
+    expect(within(readinessPanel).queryByRole("button", { name: /验证码转发/i })).not.toBeInTheDocument();
+    expect(within(readinessPanel).getByRole("link", { name: /^查看身份与模板$/i })).toHaveAttribute("href", "/mail/settings");
     expect(screen.queryByText(/^异常记录$/i)).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: /切换发件身份.*Ops.*ops@example.com/i })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: /^全部$/i })).toHaveAttribute("aria-selected", "true");
@@ -401,17 +406,15 @@ describe("outbound page integration", () => {
     expect(screen.queryByText(/发件箱入口已占位/i)).not.toBeInTheDocument();
   });
 
-  it("opens the compose drawer from an outbound template", async () => {
-    const user = userEvent.setup();
-    window.history.pushState({}, "", "/mail/outbound");
+  it("opens the compose drawer when a template is chosen from mail settings", async () => {
+    window.history.pushState({}, "", "/mail/outbound?template=verification-forward");
     render(<App />);
 
     expect(await screen.findByRole("heading", { name: /^发件箱$/i })).toBeInTheDocument();
-    await user.click(await screen.findByRole("button", { name: /验证码转发/i }));
-
     const dialog = await screen.findByRole("dialog", { name: /^新建发送$/i });
     expect(within(dialog).getByDisplayValue("验证码通知：{{code}}")).toBeInTheDocument();
     expect(within(dialog).getByDisplayValue(/收到新的验证码：\{\{code\}\}/i)).toBeInTheDocument();
+    expect(window.location.search).not.toContain("template=");
   });
 
   it("switches the outbound mailbox identity and refreshes the send history", async () => {
