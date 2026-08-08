@@ -294,7 +294,7 @@ describe("worker app", () => {
       apiDailyLimit: 20000,
       apiCallsToday: 7,
       dailyLimit: 20,
-      sendsToday: 2,
+      sendsToday: 0,
       disabled: false,
       updatedAt: new Date().toISOString()
     });
@@ -302,6 +302,30 @@ describe("worker app", () => {
       userId: member.id,
       label: "Shared mailbox",
       address: "shared@example.com"
+    });
+    await store.outboundMessages.create({
+      mailboxId: mailbox.id,
+      fromAddress: mailbox.address,
+      toAddress: "recipient@example.com",
+      subject: "Commercial summary",
+      bodyText: "Commercial summary",
+      status: "sent",
+      errorText: null,
+      providerMessageId: "provider-commercial",
+      requestPayloadJson: "{}",
+      responsePayloadJson: "{}"
+    });
+    await store.outboundMessages.create({
+      mailboxId: mailbox.id,
+      fromAddress: mailbox.address,
+      toAddress: "recipient@example.com",
+      subject: "Commercial failure",
+      bodyText: "Commercial failure",
+      status: "failed",
+      errorText: "provider unavailable",
+      providerMessageId: null,
+      requestPayloadJson: "{}",
+      responsePayloadJson: null
     });
     await store.messages.create({
       mailboxId: mailbox.id,
@@ -341,7 +365,8 @@ describe("worker app", () => {
     expect(commercialPayload.commercial.quotaUsage).toMatchObject({
       users: 2,
       mailboxes: 1,
-      apiCallsToday: 7
+      apiCallsToday: 7,
+      outboundSentToday: 1
     });
     expect(commercialPayload.commercial.teamWorkspaces[0]).toMatchObject({
       name: "WeMail 默认组织",

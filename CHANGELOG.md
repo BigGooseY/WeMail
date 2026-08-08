@@ -14,9 +14,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.9] - 2026-08-08
+
 ### Changed
 
-- Redesigned the outbound mail center as a quieter control surface with a balanced sender identity strip, neutral summary cards, and a compact responsive sending-readiness panel.
+- Refined the outbound mail center to match the shared workspace header and surface language, reduced its readiness area to an execution-focused delivery route, and moved sender identities, DNS checks, and template entry points into Mail Settings.
+
+### Fixed
+
+- Prevented the user settings page from being blocked by a slow commercial summary request, added a retryable failure state for that panel, and replaced per-mailbox outbound history scans with an indexed aggregate query (D1 migration 0019).
 
 ## [0.2.8] - 2026-07-12
 

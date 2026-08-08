@@ -46,16 +46,18 @@ describe("outbound styles", () => {
     expect(statGridRule).toContain("grid-template-columns: repeat(3, minmax(0, 1fr))");
   });
 
-  it("uses a neutral elevated surface and restrained interaction for outbound summary cards", () => {
+  it("uses the same quiet muted surface language as the rest of the workspace", () => {
     const statCardRule = getRuleBody(".outbound-stat-card");
     const statCardHoverRule = getRuleBody(".outbound-stat-card:hover");
+    const toolbarRule = getRuleBody(".outbound-toolbar-card");
 
     expect(statCardRule).toContain("--outbound-stat-accent: var(--accent)");
-    expect(statCardRule).toContain("background: var(--surface-elevated)");
+    expect(statCardRule).toContain("background: var(--surface-muted)");
     expect(statCardRule).toContain("border: 1px solid var(--border-subtle)");
+    expect(statCardRule).toContain("border-radius: 16px");
     expect(statCardRule).not.toContain("linear-gradient");
+    expect(toolbarRule).toContain("padding: 22px 24px");
     expect(statCardHoverRule).toContain("border-color: var(--border-strong)");
-    expect(statCardHoverRule).toContain("box-shadow:");
     expect(statCardHoverRule).not.toContain("transform: translateY");
   });
 
@@ -67,18 +69,19 @@ describe("outbound styles", () => {
     expect(focusRule).toContain("box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 16%, transparent)");
   });
 
-  it("keeps the readiness panel compact and collapses it in two responsive stages", () => {
+  it("uses a compact delivery-route strip and collapses it in two responsive stages", () => {
     const readinessPanelRule = getRuleBody(".outbound-readiness-panel");
+    const readinessRouteRule = getRuleBody(".outbound-readiness-grid::before");
     const mediumContainer = getBlockBody(sharedStyles, "@container (max-width: 980px)");
     const smallContainer = getBlockBody(sharedStyles, "@container (max-width: 640px)");
 
-    expect(readinessPanelRule).toContain("gap: 10px");
-    expect(readinessPanelRule).toContain("padding: 12px");
-    expect(readinessPanelRule).toContain("border-radius: 8px");
-    expect(readinessPanelRule).toContain("background: color-mix");
+    expect(readinessPanelRule).toContain("gap: 14px");
+    expect(readinessPanelRule).toContain("padding: 15px 16px");
+    expect(readinessPanelRule).toContain("border-radius: 18px");
+    expect(readinessPanelRule).toContain("background: var(--surface-muted)");
+    expect(readinessRouteRule).toContain("height: 1px");
     expect(getRuleBodyFrom(mediumContainer, ".outbound-command-strip")).toContain("grid-template-columns: 1fr");
     expect(getRuleBodyFrom(mediumContainer, ".outbound-stat-grid")).toContain("grid-template-columns: repeat(3, minmax(0, 1fr))");
-    expect(getRuleBodyFrom(mediumContainer, ".outbound-readiness-columns")).toContain("grid-template-columns: 1fr");
     expect(getRuleBodyFrom(smallContainer, ".outbound-stat-grid,\n  .outbound-readiness-grid")).toContain("grid-template-columns: 1fr");
   });
 });

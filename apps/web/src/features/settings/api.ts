@@ -8,6 +8,7 @@ import type {
   MailSettingsUpdateInput,
   MailDomainSettings,
   MailDomainSummary,
+  OutboundMaturitySummary,
   ProductMaturitySummary,
   RuntimeSettings,
   RuntimeSettingsUpdateInput,
@@ -207,6 +208,10 @@ export function fetchMailSettings() {
   return apiFetch<{ settings: MailSettings }>("/api/mail/settings", {
     cacheTtlMs: SETTINGS_CACHE_TTL_MS
   });
+}
+
+export function fetchOutboundMaturity() {
+  return apiFetch<{ maturity: OutboundMaturitySummary }>("/api/mail/outbound/maturity");
 }
 
 export function updateMailSettings(payload: MailSettingsUpdateInput) {

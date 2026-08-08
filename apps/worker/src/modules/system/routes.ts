@@ -228,32 +228,12 @@ async function countTelegramState(store: AppStore, users: UserRecord[]) {
 }
 
 async function countOutboundState(store: AppStore, mailboxIds: string[]) {
-  if (mailboxIds.length === 0) {
-    return {
-      failed: 0,
-      sent: 0,
-      total: 0
-    };
-  }
-
-  const summaries = await Promise.all(
-    mailboxIds.map((mailboxId) =>
-      store.outboundMessages.listByMailbox({
-        mailboxId,
-        page: 1,
-        pageSize: 1
-      })
-    )
-  );
-
-  return summaries.reduce(
-    (stats, result) => ({
-      failed: stats.failed + result.summary.failedCount,
-      sent: stats.sent + result.summary.sentCount,
-      total: stats.total + result.summary.totalCount
-    }),
-    { failed: 0, sent: 0, total: 0 }
-  );
+  const summary = await store.outboundMessages.summarizeByMailboxes({ mailboxIds });
+  return {
+    failed: summary.failedCount,
+    sent: summary.sentCount,
+    total: summary.totalCount
+  };
 }
 
 const knownMigrationSummaries = [
@@ -263,7 +243,9 @@ const knownMigrationSummaries = [
   ["0014", "API Key scopes", "为 API Key 增加权限范围。"],
   ["0015", "会话设备与邀请码策略", "记录设备会话、登录历史、邀请码有效期和目标角色。"],
   ["0016", "通知规则", "持久化通知规则和投递抑制条件。"],
-  ["0017", "清理任务运行记录", "记录定时清理任务成功/失败和删除数量。"]
+  ["0017", "清理任务运行记录", "记录定时清理任务成功/失败和删除数量。"],
+  ["0018", "邀请码兑换次数", "支持邀请码的多次兑换上限和当前兑换次数。"],
+  ["0019", "外发统计索引", "为按邮箱和时间聚合外发用量增加查询索引。"]
 ] as const;
 
 async function buildDataReliability(c: Context<AppContext>): Promise<DataReliabilitySummary> {

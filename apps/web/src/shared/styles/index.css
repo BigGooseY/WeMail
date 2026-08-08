@@ -9931,6 +9931,45 @@ button:disabled {
   gap: 14px;
 }
 
+.users-commercial-error {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid color-mix(in srgb, var(--warning-500) 34%, var(--border));
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--warning-500) 8%, var(--surface-muted));
+}
+
+.users-commercial-error > svg {
+  color: var(--warning-500);
+}
+
+.users-commercial-error strong,
+.users-commercial-error p {
+  margin: 0;
+}
+
+.users-commercial-error strong {
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.users-commercial-error p {
+  margin-top: 4px;
+  color: var(--text-soft);
+  font-size: 0.82rem;
+}
+
+.users-commercial-loading {
+  min-height: 88px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface-muted) 82%, transparent);
+}
+
 .users-commercial-usage-grid,
 .users-commercial-plan-grid {
   display: grid;
@@ -11642,6 +11681,15 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 
+  .users-commercial-error {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .users-commercial-error .ui-button {
+    grid-column: 2;
+    justify-self: start;
+  }
+
   .message-batch-actions,
   .link-risk-card .ui-button {
     width: 100%;
@@ -12243,8 +12291,9 @@ button:disabled {
 
 .outbound-toolbar-card {
   container-type: inline-size;
-  gap: 14px;
-  padding: 26px 30px 24px;
+  align-content: start;
+  gap: 18px;
+  padding: 22px 24px;
   overflow: hidden;
 }
 
@@ -12261,8 +12310,8 @@ button:disabled {
 }
 
 .outbound-page-header .ui-page-header-title {
-  font-size: clamp(2rem, 2.4vw, 2.55rem);
-  letter-spacing: -0.055em;
+  font-size: clamp(1.6rem, 2vw, 2rem);
+  letter-spacing: -0.04em;
 }
 
 .outbound-page-header .ui-page-header-description {
@@ -12296,17 +12345,17 @@ button:disabled {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   width: 100%;
-  min-height: 84px;
+  min-height: 88px;
   height: 100%;
   align-items: center;
   justify-content: stretch;
   gap: 12px;
   padding: 12px 14px;
   border: 1px solid var(--border-subtle);
-  border-radius: 8px;
-  background: var(--surface-elevated);
+  border-radius: 16px;
+  background: var(--surface-muted);
   color: var(--text-primary);
-  box-shadow: 0 4px 14px color-mix(in srgb, var(--shadow-color) 7%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 44%, transparent);
   transition:
     border-color 160ms ease,
     background 160ms ease,
@@ -12320,8 +12369,8 @@ button:disabled {
 
 .outbound-mailbox-trigger.ui-button:hover {
   border-color: var(--border-strong);
-  background: var(--surface-elevated);
-  box-shadow: 0 6px 18px color-mix(in srgb, var(--shadow-color) 9%, transparent);
+  background: color-mix(in srgb, var(--accent) 6%, var(--surface-muted));
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 44%, transparent);
 }
 
 .outbound-mailbox-trigger.ui-button:focus-visible {
@@ -12397,14 +12446,14 @@ button:disabled {
     "icon detail value";
   column-gap: 10px;
   row-gap: 1px;
-  min-height: 84px;
+  min-height: 88px;
   align-items: center;
   min-width: 0;
   padding: 13px 14px;
   border: 1px solid var(--border-subtle);
-  border-radius: 8px;
-  background: var(--surface-elevated);
-  box-shadow: 0 4px 14px color-mix(in srgb, var(--shadow-color) 7%, transparent);
+  border-radius: 16px;
+  background: var(--surface-muted);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 44%, transparent);
   transition:
     border-color 160ms ease,
     background 160ms ease,
@@ -12491,8 +12540,8 @@ button:disabled {
 @media (hover: hover) {
   .outbound-stat-card:hover {
     border-color: var(--border-strong);
-    background: var(--surface-elevated);
-    box-shadow: 0 6px 18px color-mix(in srgb, var(--shadow-color) 9%, transparent);
+    background: color-mix(in srgb, var(--outbound-stat-accent) 5%, var(--surface-muted));
+    box-shadow: inset 0 1px 0 color-mix(in srgb, white 44%, transparent);
   }
 }
 
@@ -12506,16 +12555,15 @@ button:disabled {
 
 .outbound-readiness-panel {
   display: grid;
-  gap: 10px;
+  gap: 14px;
   min-width: 0;
-  padding: 12px;
-  border: 1px solid color-mix(in srgb, var(--border-subtle) 90%, transparent);
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--surface-muted) 54%, var(--surface-elevated));
+  padding: 15px 16px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+  background: var(--surface-muted);
 }
 
-.outbound-readiness-header,
-.outbound-check-list-header {
+.outbound-readiness-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -12525,6 +12573,26 @@ button:disabled {
 
 .outbound-readiness-header h2 {
   margin: 0;
+  font-size: 1rem;
+  letter-spacing: 0;
+}
+
+.outbound-readiness-header > div:first-child {
+  display: grid;
+  gap: 4px;
+}
+
+.outbound-readiness-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.outbound-readiness-actions .ui-button-text {
+  min-height: 32px;
+  padding-inline: 10px;
 }
 
 .outbound-readiness-status {
@@ -12557,16 +12625,25 @@ button:disabled {
   color: #c34238;
 }
 
-.outbound-readiness-grid,
-.outbound-readiness-columns {
+.outbound-readiness-grid {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   min-width: 0;
 }
 
-.outbound-readiness-metric,
-.outbound-check-list {
+.outbound-readiness-grid::before {
+  position: absolute;
+  top: 21px;
+  right: calc(16.666% + 24px);
+  left: calc(16.666% + 24px);
+  height: 1px;
+  background: color-mix(in srgb, var(--accent) 30%, var(--border-subtle));
+  content: "";
+}
+
+.outbound-readiness-metric {
   display: grid;
   min-width: 0;
   gap: 6px;
@@ -12577,21 +12654,30 @@ button:disabled {
 }
 
 .outbound-readiness-metric {
+  position: relative;
+  z-index: 1;
   grid-template-columns: auto minmax(0, 1fr);
   align-items: start;
-  column-gap: 9px;
+  column-gap: 10px;
+  padding: 5px 8px;
+  border: 0;
+  background: transparent;
 }
 
 .outbound-readiness-metric svg {
   grid-row: span 3;
+  width: 32px;
+  height: 32px;
   margin-top: 1px;
+  padding: 7px;
+  border: 1px solid color-mix(in srgb, var(--accent) 26%, var(--border-subtle));
+  border-radius: 999px;
+  background: var(--surface-elevated);
   color: var(--accent);
 }
 
 .outbound-readiness-metric p,
 .outbound-readiness-metric span,
-.outbound-check-row small,
-.outbound-template-button small,
 .outbound-readiness-loading {
   margin: 0;
   color: var(--text-secondary);
@@ -12615,88 +12701,6 @@ button:disabled {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.outbound-check-list-header {
-  justify-content: flex-start;
-  color: var(--text-primary);
-  font-size: 0.9rem;
-}
-
-.outbound-check-list-header svg {
-  color: var(--accent);
-}
-
-.outbound-check-row {
-  position: relative;
-  display: grid;
-  min-width: 0;
-  gap: 2px;
-  padding-left: 12px;
-}
-
-.outbound-check-row::before {
-  position: absolute;
-  top: 0.32rem;
-  left: 0;
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-  background: var(--text-secondary);
-  content: "";
-}
-
-.outbound-check-row[data-status="ok"]::before {
-  background: #1fa971;
-}
-
-.outbound-check-row[data-status="warning"]::before {
-  background: #f2a93b;
-}
-
-.outbound-check-row[data-status="error"]::before {
-  background: #e16259;
-}
-
-.outbound-check-row span,
-.outbound-check-row small,
-.outbound-template-button span,
-.outbound-template-button small {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.outbound-check-row span,
-.outbound-template-button span {
-  color: var(--text-primary);
-  font-weight: 730;
-}
-
-.outbound-template-button.ui-button {
-  display: grid;
-  width: 100%;
-  min-height: 42px;
-  justify-content: stretch;
-  justify-items: start;
-  gap: 2px;
-  padding: 6px 7px;
-  border: 1px solid transparent;
-  border-radius: 8px;
-  color: inherit;
-  text-align: left;
-}
-
-.outbound-template-button.ui-button::before {
-  display: none;
-}
-
-.outbound-template-button.ui-button:hover,
-.outbound-template-button.ui-button:focus-visible {
-  border-color: color-mix(in srgb, var(--accent) 34%, var(--border-subtle));
-  background: color-mix(in srgb, var(--accent) 9%, var(--surface-elevated));
-  transform: none;
 }
 
 .outbound-readiness-loading {
@@ -13238,15 +13242,16 @@ button:disabled {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .outbound-readiness-columns {
-    grid-template-columns: 1fr;
-  }
 }
 
 @container (max-width: 640px) {
   .outbound-stat-grid,
   .outbound-readiness-grid {
     grid-template-columns: 1fr;
+  }
+
+  .outbound-readiness-grid::before {
+    display: none;
   }
 
   .outbound-readiness-header {
@@ -13502,6 +13507,143 @@ button:disabled {
   background: color-mix(in srgb, var(--surface-muted) 78%, transparent);
 }
 
+.mail-settings-outbound-assets-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  align-items: stretch;
+}
+
+.mail-settings-asset-panel {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid color-mix(in srgb, var(--border) 86%, transparent);
+  border-radius: 20px;
+  background: var(--surface-muted);
+}
+
+.mail-settings-asset-list,
+.mail-settings-template-list {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-width: 0;
+}
+
+.mail-settings-asset-row {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 11px 12px 11px 24px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  background: var(--surface-elevated);
+}
+
+.mail-settings-asset-row::before {
+  position: absolute;
+  top: 17px;
+  left: 10px;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--text-muted);
+  content: "";
+}
+
+.mail-settings-asset-row[data-status="ok"]::before {
+  background: #20a875;
+}
+
+.mail-settings-asset-row[data-status="warning"]::before {
+  background: #e69a22;
+}
+
+.mail-settings-asset-row[data-status="error"]::before {
+  background: #dd5a51;
+}
+
+.mail-settings-asset-row > div,
+.mail-settings-template-link.ui-button > span {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.mail-settings-asset-row strong,
+.mail-settings-asset-row span,
+.mail-settings-asset-row small,
+.mail-settings-template-link strong,
+.mail-settings-template-link small {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mail-settings-asset-row strong,
+.mail-settings-template-link strong {
+  color: var(--text);
+  font-size: 0.9rem;
+  letter-spacing: 0;
+}
+
+.mail-settings-asset-row span,
+.mail-settings-asset-row small,
+.mail-settings-template-link small {
+  color: var(--text-soft);
+  font-size: 0.78rem;
+}
+
+.mail-settings-asset-row span {
+  white-space: nowrap;
+}
+
+.mail-settings-asset-row small {
+  display: -webkit-box;
+  line-height: 1.4;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.mail-settings-template-link.ui-button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  min-height: 64px;
+  align-items: center;
+  justify-content: stretch;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  background: var(--surface-elevated);
+  color: var(--text);
+  text-align: left;
+}
+
+.mail-settings-template-link.ui-button::before {
+  display: none;
+}
+
+.mail-settings-template-link.ui-button:hover,
+.mail-settings-template-link.ui-button:focus-visible {
+  border-color: color-mix(in srgb, var(--accent) 34%, var(--border));
+  background: color-mix(in srgb, var(--accent) 7%, var(--surface-elevated));
+  transform: none;
+}
+
+.mail-settings-template-link.ui-button > svg {
+  color: var(--accent);
+}
+
+.mail-settings-assets-loading {
+  margin: 0;
+  color: var(--text-soft);
+}
+
 .mail-settings-panel-title {
   display: inline-flex;
   align-items: center;
@@ -13620,7 +13762,8 @@ button:disabled {
 
 @media (max-width: 960px) {
   .mail-settings-hero-layout,
-  .mail-settings-rule-grid {
+  .mail-settings-rule-grid,
+  .mail-settings-outbound-assets-grid {
     grid-template-columns: 1fr;
   }
 

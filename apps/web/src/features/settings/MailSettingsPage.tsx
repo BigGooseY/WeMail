@@ -2,12 +2,15 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   BellRing,
   Clock3,
+  FileText,
   MailCheck,
+  Network,
   PanelTopOpen,
   RadioTower,
   Route,
   Save,
   SendHorizontal,
+  ShieldCheck,
   SlidersHorizontal,
   type LucideIcon
 } from "lucide-react";
@@ -18,13 +21,15 @@ import {
   type MailSettingsRouting,
   type MailSettingsSenderRules,
   type MailSettingsWorkspaceDefaults,
+  type OutboundMaturitySummary,
   type TelegramOverviewSummary
 } from "@wemail/shared";
 
-import { Button } from "../../shared/button";
+import { Button, ButtonLink } from "../../shared/button";
 import { CheckboxField, FormField, SelectInput, TextInput, TextareaInput } from "../../shared/form";
 import {
   fetchMailSettings,
+  fetchOutboundMaturity,
   fetchTelegramOverview,
   fetchWebhookEndpoints,
   updateMailSettings,
@@ -119,6 +124,8 @@ export function MailSettingsPage({ canManageMailSettings = false }: MailSettings
   const [isSavingRouting, setIsSavingRouting] = useState(false);
   const [isSavingWorkspace, setIsSavingWorkspace] = useState(false);
   const [settingsError, setSettingsError] = useState<string | null>(null);
+  const [outboundMaturity, setOutboundMaturity] = useState<OutboundMaturitySummary | null>(null);
+  const [outboundMaturityError, setOutboundMaturityError] = useState<string | null>(null);
   const [webhookEndpoints, setWebhookEndpoints] = useState<WebhookEndpointSummary[]>([]);
   const [telegramOverview, setTelegramOverview] = useState<TelegramOverviewSummary>(emptyTelegramOverview);
 
@@ -145,13 +152,16 @@ export function MailSettingsPage({ canManageMailSettings = false }: MailSettings
     setIsLoadingSettings(true);
     void Promise.all([
       fetchMailSettings(),
+      fetchOutboundMaturity().catch((error) => ({ maturity: null, error })),
       fetchWebhookEndpoints().catch(() => ({ endpoints: [] })),
       fetchTelegramOverview().catch(() => ({ overview: emptyTelegramOverview }))
     ])
-      .then(([{ settings }, webhookPayload, telegramPayload]) => {
+      .then(([{ settings }, maturityPayload, webhookPayload, telegramPayload]) => {
         if (cancelled) return;
         const nextWebhookEndpoints = webhookPayload.endpoints ?? [];
         const nextTelegramOverview = telegramPayload.overview ?? emptyTelegramOverview;
+        setOutboundMaturity(maturityPayload.maturity);
+        setOutboundMaturityError("error" in maturityPayload ? readErrorMessage(maturityPayload.error) : null);
         setWebhookEndpoints(nextWebhookEndpoints);
         setTelegramOverview(nextTelegramOverview);
         applyMailSettings(settings, nextWebhookEndpoints, nextTelegramOverview);
@@ -485,6 +495,94 @@ export function MailSettingsPage({ canManageMailSettings = false }: MailSettings
             </Button>
             {senderSavedNotice ? <p className="mail-settings-save-notice" role="status">发件规则已保存</p> : null}
           </div>
+        </section>
+
+        <section className="panel workspace-card page-panel integration-surface-card mail-settings-section mail-settings-assets-section">
+          <div className="mail-settings-section-header">
+            <div className="mail-settings-section-title">
+              <span className="mail-settings-section-icon" aria-hidden="true">
+                <ShieldCheck size={19} strokeWidth={1.8} />
+              </span>
+              <div className="integration-card-copy compact">
+                <p className="panel-kicker">发件资产</p>
+                <h2>发信身份与模板</h2>
+                <p className="section-copy">身份校验、域名记录和复用模板在这里集中查看与使用；发件箱只负责本次选择、发送和查看投递结果。</p>
+              </div>
+            </div>
+            <span className="mail-settings-dirty-pill" data-state="clean">
+              {outboundMaturity ? `${outboundMaturity.identities.length} 个身份` : "正在同步"}
+            </span>
+          </div>
+
+          {outboundMaturityError ? (
+            <p className="error-banner" role="alert">
+              {outboundMaturityError}
+            </p>
+          ) : outboundMaturity ? (
+            <div className="mail-settings-outbound-assets-grid">
+              <section aria-label="发信身份" className="mail-settings-asset-panel">
+                <div className="mail-settings-panel-title">
+                  <SendHorizontal size={17} strokeWidth={1.8} aria-hidden="true" />
+                  <span>发信身份</span>
+                </div>
+                <div className="mail-settings-asset-list">
+                  {outboundMaturity.identities.map((identity) => (
+                    <div className="mail-settings-asset-row" data-status={identity.status} key={identity.id}>
+                      <div>
+                        <strong>{identity.isDefault ? "默认身份" : identity.label}</strong>
+                        <span title={identity.address}>{identity.address}</span>
+                      </div>
+                      <small>{identity.message}</small>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <section aria-label="域名验证" className="mail-settings-asset-panel">
+                <div className="mail-settings-panel-title">
+                  <Network size={17} strokeWidth={1.8} aria-hidden="true" />
+                  <span>域名验证</span>
+                </div>
+                <div className="mail-settings-asset-list">
+                  {outboundMaturity.dnsChecks.map((check) => (
+                    <div className="mail-settings-asset-row" data-status={check.status} key={check.id}>
+                      <div>
+                        <strong>{check.label}</strong>
+                        <span>{check.recordType} · {check.domain}</span>
+                      </div>
+                      <small>{check.message}</small>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <section aria-label="发信模板" className="mail-settings-asset-panel">
+                <div className="mail-settings-panel-title">
+                  <FileText size={17} strokeWidth={1.8} aria-hidden="true" />
+                  <span>发信模板</span>
+                </div>
+                <div className="mail-settings-template-list">
+                  {outboundMaturity.templates.map((template) => (
+                    <ButtonLink
+                      className="mail-settings-template-link"
+                      contentLayout="plain"
+                      key={template.id}
+                      to={`/mail/outbound?template=${encodeURIComponent(template.id)}`}
+                      variant="text"
+                    >
+                      <span>
+                        <strong>{template.name}</strong>
+                        <small>{template.description}</small>
+                      </span>
+                      <SendHorizontal size={15} strokeWidth={1.9} aria-hidden="true" />
+                    </ButtonLink>
+                  ))}
+                </div>
+              </section>
+            </div>
+          ) : (
+            <p className="mail-settings-assets-loading" role="status">正在读取发信身份与模板…</p>
+          )}
         </section>
 
         <section className="panel workspace-card page-panel integration-surface-card mail-settings-section">

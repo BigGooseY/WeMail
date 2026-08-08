@@ -504,21 +504,15 @@ function resolveCurrentPlanId(input: { users: UserRecord[]; mailboxCount: number
 }
 
 async function countOutboundUsage(context: AdminUseCaseContext, mailboxIds: string[]) {
-  if (mailboxIds.length === 0) return { sentToday: 0, total: 0 };
-  const todayPrefix = new Date().toISOString().slice(0, 10);
-  const results = await Promise.all(
-    mailboxIds.map((mailboxId) =>
-      context.store.outboundMessages.listByMailbox({
-        mailboxId,
-        page: 1,
-        pageSize: 500
-      })
-    )
-  );
-  const messages = results.flatMap((result) => result.messages);
+  const todayStartIso = `${new Date().toISOString().slice(0, 10)}T00:00:00.000Z`;
+  const summary = await context.store.outboundMessages.summarizeByMailboxes({
+    mailboxIds,
+    sinceIso: todayStartIso
+  });
+
   return {
-    sentToday: messages.filter((message) => message.status === "sent" && message.createdAt.startsWith(todayPrefix)).length,
-    total: messages.length
+    sentToday: summary.sentSinceCount,
+    total: summary.totalCount
   };
 }
 

@@ -7,7 +7,6 @@ import type {
   MessageListQuery,
   MessageListResult,
   MessageSummary,
-  OutboundMaturitySummary,
   OutboundListQuery,
   OutboundListResult
 } from "@wemail/shared";
@@ -144,10 +143,6 @@ export function fetchOutboundHistory(query: string | OutboundListQueryInput) {
 
 export function fetchOutboundDetail(messageId: string) {
   return apiFetch<{ message: OutboundHistoryDetail }>(`/api/mail/outbound/${encodeURIComponent(messageId)}`);
-}
-
-export function fetchOutboundMaturity() {
-  return apiFetch<{ maturity: OutboundMaturitySummary }>("/api/mail/outbound/maturity");
 }
 
 export function sendOutboundMessage(payload: {

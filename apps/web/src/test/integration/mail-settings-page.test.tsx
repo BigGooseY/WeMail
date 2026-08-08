@@ -73,6 +73,73 @@ function mockMailShell(options?: { role?: "admin" | "member" }) {
       return jsonResponse({ settings: mailSettings });
     }
 
+    if (url.endsWith("/api/mail/outbound/maturity")) {
+      return jsonResponse({
+        maturity: {
+          generatedAt: "2026-04-08T09:30:00.000Z",
+          featureEnabled: true,
+          resendConfigured: true,
+          defaultIdentity: "Ops Mail <ops@wemail.test>",
+          quota: {
+            userId: "user-1",
+            apiDailyLimit: 20000,
+            apiCallsToday: 3,
+            dailyLimit: 20,
+            sendsToday: 5,
+            disabled: false,
+            updatedAt: "2026-04-08T09:30:00.000Z"
+          },
+          retryPolicy: {
+            enabled: true,
+            attempts: "2 次",
+            delay: "5 分钟",
+            failureRetention: "30 天"
+          },
+          failureStats: {
+            total: 8,
+            sent: 7,
+            failed: 1,
+            recentFailureReason: "SMTP timeout"
+          },
+          returnPath: {
+            status: "ok",
+            message: "Return-Path 正常"
+          },
+          identities: [
+            {
+              id: "box-1",
+              label: "Ops",
+              address: "ops@example.com",
+              domain: "example.com",
+              isDefault: true,
+              status: "ok",
+              message: "身份域名与系统邮箱域名一致"
+            }
+          ],
+          dnsChecks: [
+            {
+              id: "spf",
+              label: "SPF",
+              domain: "example.com",
+              recordType: "TXT",
+              expectedValue: "v=spf1 include:example.net ~all",
+              status: "ok",
+              message: "记录已验证"
+            }
+          ],
+          templates: [
+            {
+              id: "verification-forward",
+              name: "验证码转发",
+              description: "转发一次性验证码",
+              subject: "验证码通知：{{code}}",
+              bodyText: "收到新的验证码：{{code}}"
+            }
+          ]
+        }
+      });
+    }
+
     if (url.endsWith("/api/webhook/endpoints")) {
       return jsonResponse({
         endpoints: [
@@ -179,10 +246,17 @@ describe("mail settings integration", () => {
     expect(screen.getByText(/^邮件中心$/i)).toBeInTheDocument();
     expect(screen.queryByText(/把发件身份、异常流转和工作台默认行为/i)).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /^发件规则$/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /^发信身份与模板$/i })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /^通知与路由$/i })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /^工作台行为偏好$/i })).toBeInTheDocument();
     expect(screen.queryByRole("complementary", { name: /当前策略摘要/i })).not.toBeInTheDocument();
     expect(screen.getByLabelText(/^默认发件身份$/i)).toBeInTheDocument();
+    expect(await screen.findByRole("region", { name: /^发信身份$/i })).toHaveTextContent("ops@example.com");
+    expect(screen.getByRole("region", { name: /^域名验证$/i })).toHaveTextContent("SPF");
+    expect(screen.getByRole("region", { name: /^发信模板$/i }).querySelector("a")).toHaveAttribute(
+      "href",
+      "/mail/outbound?template=verification-forward"
+    );
     expect(screen.getByLabelText(/^Webhook 通知$/i)).toBeInTheDocument();
     expect(screen.queryByText(/qa@example\.com/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/邮件设置先做占位/i)).not.toBeInTheDocument();

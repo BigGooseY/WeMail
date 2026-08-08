@@ -177,6 +177,18 @@ export type OutboundMessageListResult = {
   total: number;
 };
 
+export type OutboundMessageUsageQuery = {
+  mailboxIds: string[];
+  sinceIso?: string;
+};
+
+export type OutboundMessageUsageSummary = {
+  totalCount: number;
+  sentCount: number;
+  failedCount: number;
+  sentSinceCount: number;
+};
+
 export type CleanupRunRecord = {
   id: string;
   status: "success" | "failed";
@@ -601,6 +613,7 @@ export interface AppStore {
       responsePayloadJson: string | null;
     }) => Promise<OutboundMessageRecord>;
     listByMailbox: (query: OutboundMessageListQuery) => Promise<OutboundMessageListResult>;
+    summarizeByMailboxes: (query: OutboundMessageUsageQuery) => Promise<OutboundMessageUsageSummary>;
     findById: (id: string) => Promise<OutboundMessageRecord | null>;
   };
   apiKeys: {

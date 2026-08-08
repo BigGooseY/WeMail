@@ -19,4 +19,10 @@ describe("mail settings styles", () => {
     expect(sharedStyles).toMatch(/\.mail-settings-target-field\s*\{[^}]*grid-template-rows:\s*auto 1fr;/);
     expect(sharedStyles).toMatch(/\.mail-settings-target-control\.form-control\s*\{[^}]*height:\s*56px;/);
   });
+
+  it("gives sender identities, DNS checks, and templates one responsive asset grid", () => {
+    expect(sharedStyles).toMatch(/\.mail-settings-outbound-assets-grid\s*\{[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\);/);
+    expect(sharedStyles).toMatch(/\.mail-settings-asset-panel\s*\{[^}]*background:\s*var\(--surface-muted\);/);
+    expect(sharedStyles).toMatch(/@media\s*\(max-width:\s*960px\)[\s\S]*\.mail-settings-outbound-assets-grid\s*\{[^}]*grid-template-columns:\s*1fr;/);
+  });
 });

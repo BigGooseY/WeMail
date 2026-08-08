@@ -50,7 +50,7 @@ describe("admin data", () => {
     vi.restoreAllMocks();
   });
 
-  it("loads settings dashboard data from user summary and paginated invite/mailbox endpoints", async () => {
+  it("loads core settings data without waiting for the commercial summary", async () => {
     const calls: string[] = [];
     vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
       const url = getUrl(input);
@@ -109,6 +109,10 @@ describe("admin data", () => {
         });
       }
 
+      if (url.includes("/api/users/commercial")) {
+        return new Promise<Response>(() => undefined);
+      }
+
       if (url.includes("/api/users")) {
         return jsonResponse({
           page: 1,
@@ -134,6 +138,7 @@ describe("admin data", () => {
     expect(calls.some((url) => url.includes("/api/users/summary?page=1&pageSize=5"))).toBe(true);
     expect(calls.some((url) => url.includes("/api/users/invites?page=1&pageSize=5"))).toBe(true);
     expect(calls.some((url) => url.includes("/api/users/accounts?page=1&pageSize=5"))).toBe(true);
+    expect(calls.some((url) => url.includes("/api/users/commercial"))).toBe(false);
   });
 
   it("stores the feature toggles returned by the backend after an update", async () => {
