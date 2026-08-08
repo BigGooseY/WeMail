@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Prevented the user settings page from being blocked by a slow commercial summary request, added a retryable failure state for that panel, and replaced per-mailbox outbound history scans with an indexed aggregate query (D1 migration 0019).
+- Updated authenticated E2E smoke coverage for the reorganized Mail Settings and user settings workspaces.
 
 ## [0.2.8] - 2026-07-12
 
