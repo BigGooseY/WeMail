@@ -128,7 +128,7 @@ export function FunctionalHomePage({
           </div>
           <div className="functional-home-grid">
             {authenticatedTools.map((tool) => (
-              <Link className="functional-home-tool" key={tool.href} to={isAuthenticated ? tool.href : `/login?next=${encodeURIComponent(tool.href)}`}>
+              <Link aria-label={tool.label} className="functional-home-tool" key={tool.href} to={isAuthenticated ? tool.href : `/login?next=${encodeURIComponent(tool.href)}`}>
                 <span>{tool.code}</span>
                 <h3>{tool.label}</h3>
                 <p>{tool.detail}</p>

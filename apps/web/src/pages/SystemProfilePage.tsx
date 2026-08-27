@@ -160,7 +160,15 @@ export function SystemProfilePage({
     setDensity(profile.preferences.density);
     setProfileSubmitError(null);
     setPreferencesSubmitError(null);
-  }, [profile]);
+  }, [
+    profile.preferences.bio,
+    profile.preferences.dateFormat,
+    profile.preferences.density,
+    profile.preferences.landingPage,
+    profile.preferences.locale,
+    profile.preferences.timezone,
+    profile.user.name
+  ]);
 
   async function handleProfileSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

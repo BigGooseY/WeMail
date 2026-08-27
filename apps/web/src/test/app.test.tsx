@@ -143,7 +143,7 @@ describe("App", () => {
 
       const navigation = await screen.findByRole("navigation", { name: /首页导航/i });
       expect(navigation).toBeInTheDocument();
-      expect(within(navigation).getByLabelText(/WeMail brand lockup/i)).toBeInTheDocument();
+      expect(within(navigation).getByRole("img", { name: /WeMail brand lockup/i })).toBeInTheDocument();
       expect(within(navigation).getByRole("link", { name: /^核心功能$/i })).toHaveAttribute("href", "#features");
       expect(within(navigation).getByRole("link", { name: /^部署文档$/i })).toHaveAttribute("href", "https://doc.wemail.willxue.com");
       expect(screen.getByRole("heading", { level: 1, name: /把临时邮箱/i })).toBeInTheDocument();
