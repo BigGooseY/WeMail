@@ -115,6 +115,7 @@ describe("App", () => {
   });
 
   it("renders an icon-first branded loading shell while the session request is pending", () => {
+    window.history.pushState({}, "", "/dashboard");
     vi.spyOn(globalThis, "fetch").mockImplementation(
       () =>
         new Promise<Response>(() => {
@@ -143,18 +144,12 @@ describe("App", () => {
       const navigation = await screen.findByRole("navigation", { name: /首页导航/i });
       expect(navigation).toBeInTheDocument();
       expect(within(navigation).getByLabelText(/WeMail brand lockup/i)).toBeInTheDocument();
-      expect(within(navigation).getByRole("link", { name: /^产品能力$/i })).toHaveAttribute("href", "#features");
-      expect(within(navigation).getByRole("link", { name: /^使用流程$/i })).toHaveAttribute("href", "#how-it-works");
-      expect(within(navigation).getByRole("link", { name: /^开发接入$/i })).toHaveAttribute("href", "#developers");
-      expect(within(navigation).getByRole("link", { name: /^方案价格$/i })).toHaveAttribute("href", "#pricing");
-      expect(within(navigation).getByRole("link", { name: /设计系统/i })).toHaveAttribute("href", "/design-system");
+      expect(within(navigation).getByRole("link", { name: /^核心功能$/i })).toHaveAttribute("href", "#features");
+      expect(within(navigation).getByRole("link", { name: /^部署文档$/i })).toHaveAttribute("href", "https://doc.wemail.willxue.com");
       expect(screen.getByRole("heading", { level: 1, name: /把临时邮箱/i })).toBeInTheDocument();
-      expect(within(navigation).getByRole("link", { name: /登录/i })).toHaveClass("ui-button", "ui-button-secondary");
-      expect(within(navigation).getByRole("link", { name: /注册/i })).toHaveClass("ui-button", "ui-button-primary");
-      expect(within(navigation).getByRole("button", { name: /切换到浅色主题|切换到深色主题/i })).toHaveClass(
-        "landing-nav-theme-toggle",
-        "landing-nav-edge-control"
-      );
+      expect(within(navigation).getByRole("link", { name: /登录/i })).toHaveClass("functional-home-button", "secondary");
+      expect(within(navigation).getByRole("link", { name: /注册/i })).toHaveClass("functional-home-button", "primary");
+      expect(within(navigation).getByRole("button", { name: /切换到浅色主题|切换到深色主题/i })).toHaveClass("functional-home-theme");
       expect(screen.getAllByRole("link", { name: /立即开始/i }).length).toBeGreaterThan(0);
       expect(screen.getAllByRole("link", { name: /进入登录/i }).length).toBeGreaterThan(0);
     },
@@ -185,7 +180,6 @@ describe("App", () => {
       });
       expect(globalThis.fetch).toHaveBeenCalledWith(expect.stringContaining("/api/system/health"), expect.any(Object));
       expect(screen.getByRole("link", { name: "部署文档" })).toHaveAttribute("href", "https://doc.wemail.willxue.com");
-      expect(screen.getByRole("button", { name: "返回顶部" })).toHaveClass("floating-back-to-top", "landing-back-to-top");
     },
     10000
   );
@@ -203,19 +197,20 @@ describe("App", () => {
       expect(within(navigation).queryByRole("link", { name: /^注册$/i })).not.toBeInTheDocument();
 
       const consoleLink = within(navigation).getByRole("link", { name: /^控制台$/i });
-      expect(consoleLink).toHaveClass("ui-button", "ui-button-primary");
+      expect(consoleLink).toHaveClass("functional-home-button", "primary");
       await waitFor(() => {
         expect(consoleLink).toHaveAttribute("href", "/mail/list");
       });
       const landingCtaRows = Array.from(container.querySelectorAll(".landing-cta-row"));
       expect(landingCtaRows).toHaveLength(2);
-
-      for (const ctaRow of landingCtaRows) {
-        const cta = within(ctaRow as HTMLElement).getByRole("link", { name: /^进入控制台$/i });
-        expect(cta).toHaveClass("ui-button", "ui-button-primary");
-        expect(cta).toHaveAttribute("href", "/mail/list");
-        expect(within(ctaRow as HTMLElement).queryByRole("link", { name: /立即开始|受邀注册|进入登录/i })).not.toBeInTheDocument();
-      }
+      const heroCta = within(landingCtaRows[0] as HTMLElement).getByRole("link", { name: /^进入邮件工作台$/i });
+      const bottomCta = within(landingCtaRows[1] as HTMLElement).getByRole("link", { name: /^进入控制台$/i });
+      expect(heroCta).toHaveClass("functional-home-button", "primary");
+      expect(bottomCta).toHaveClass("functional-home-button", "primary");
+      await waitFor(() => {
+        expect(heroCta).toHaveAttribute("href", "/mail/list");
+        expect(bottomCta).toHaveAttribute("href", "/mail/list");
+      });
       expect(window.location.pathname).toBe("/");
     },
     10000

@@ -8,11 +8,11 @@ describe("app route splitting", () => {
 
     expect(appSource).toContain('lazy(() => import("../pages/AuthPage")');
     expect(appSource).toContain('lazy(() => import("../pages/DesignSystemPage")');
-    expect(appSource).toContain('lazy(() => import("../features/landing/WemailLandingPage")');
+    expect(appSource).toContain('lazy(() => import("../features/landing/FunctionalHomePage")');
     expect(appSource).toContain('lazy(() => import("./WorkspaceApp")');
     expect(appSource).not.toMatch(/import \{ AuthPage \} from "\.\.\/pages\/AuthPage"/);
     expect(appSource).not.toMatch(/import \{ DesignSystemPage \} from "\.\.\/pages\/DesignSystemPage"/);
-    expect(appSource).not.toMatch(/import \{ WemailLandingPage \} from "\.\.\/features\/landing\/WemailLandingPage"/);
+    expect(appSource).not.toMatch(/import \{ FunctionalHomePage \} from "\.\.\/features\/landing\/FunctionalHomePage"/);
     expect(appSource).not.toMatch(/import \{ AppLayout \} from "\.\/AppLayout"/);
     expect(appSource).not.toMatch(/import \{ AppRoutes \} from "\.\/AppRoutes"/);
     expect(appSource).not.toMatch(/import \{ useAppShell \} from "\.\/useAppShell"/);

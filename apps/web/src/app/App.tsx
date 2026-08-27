@@ -13,7 +13,7 @@ import { useWorkspaceTheme } from "./useWorkspaceTheme";
 
 const AuthPage = lazy(() => import("../pages/AuthPage").then((module) => ({ default: module.AuthPage })));
 const DesignSystemPage = lazy(() => import("../pages/DesignSystemPage").then((module) => ({ default: module.DesignSystemPage })));
-const WemailLandingPage = lazy(() => import("../features/landing/WemailLandingPage").then((module) => ({ default: module.WemailLandingPage })));
+const FunctionalHomePage = lazy(() => import("../features/landing/FunctionalHomePage").then((module) => ({ default: module.FunctionalHomePage })));
 const WorkspaceApp = lazy(() => import("./WorkspaceApp").then((module) => ({ default: module.WorkspaceApp })));
 
 function hasExplicitPostAuthPath(search: string) {
@@ -103,6 +103,23 @@ function AppContent() {
     );
   }
 
+  if (isPublicHomePage) {
+    return (
+      <>
+        {toastViewport}
+        <LazyPublicPage>
+          <FunctionalHomePage
+            consoleHref={profile.profile?.preferences.landingPage ?? "/mail/list"}
+            isAuthenticated={Boolean(session)}
+            isSessionLoading={loadingSession}
+            onToggleTheme={toggleTheme}
+            theme={theme}
+          />
+        </LazyPublicPage>
+      </>
+    );
+  }
+
   if (loadingSession) {
     return (
       <>
@@ -141,22 +158,6 @@ function AppContent() {
     }
 
     return <Navigate to={resolvePostAuthPath(location.search, profile.profile?.preferences.landingPage ?? "/dashboard")} replace />;
-  }
-
-  if (isPublicHomePage) {
-    return (
-      <>
-        {toastViewport}
-        <LazyPublicPage>
-          <WemailLandingPage
-            consoleHref={profile.profile?.preferences.landingPage ?? "/dashboard"}
-            isAuthenticated
-            onToggleTheme={toggleTheme}
-            theme={theme}
-          />
-        </LazyPublicPage>
-      </>
-    );
   }
 
   return (
