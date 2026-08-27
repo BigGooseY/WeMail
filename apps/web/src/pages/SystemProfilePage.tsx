@@ -139,6 +139,13 @@ export function SystemProfilePage({
   const [density, setDensity] = useState(profile.preferences.density);
   const [profileSubmitError, setProfileSubmitError] = useState<string | null>(null);
   const [preferencesSubmitError, setPreferencesSubmitError] = useState<string | null>(null);
+  const profileDisplayName = resolveDisplayName(profile);
+  const profileBio = profile.preferences.bio;
+  const profileLocale = profile.preferences.locale;
+  const profileTimezone = profile.preferences.timezone;
+  const profileDateFormat = profile.preferences.dateFormat;
+  const profileLandingPage = profile.preferences.landingPage;
+  const profileDensity = profile.preferences.density;
   const roleLabel = formatRole(profile.user.role);
   const displayEmail = formatDisplayEmail(profile.user.email);
   const hasOtherSessions = sessions.some((session) => !session.isCurrent);
@@ -151,24 +158,16 @@ export function SystemProfilePage({
     density !== profile.preferences.density;
 
   useEffect(() => {
-    setDisplayName(resolveDisplayName(profile));
-    setBio(profile.preferences.bio);
-    setLocale(profile.preferences.locale);
-    setTimezone(profile.preferences.timezone);
-    setDateFormat(profile.preferences.dateFormat);
-    setLandingPage(profile.preferences.landingPage);
-    setDensity(profile.preferences.density);
+    setDisplayName(profileDisplayName);
+    setBio(profileBio);
+    setLocale(profileLocale);
+    setTimezone(profileTimezone);
+    setDateFormat(profileDateFormat);
+    setLandingPage(profileLandingPage);
+    setDensity(profileDensity);
     setProfileSubmitError(null);
     setPreferencesSubmitError(null);
-  }, [
-    profile.preferences.bio,
-    profile.preferences.dateFormat,
-    profile.preferences.density,
-    profile.preferences.landingPage,
-    profile.preferences.locale,
-    profile.preferences.timezone,
-    profile.user.name
-  ]);
+  }, [profileBio, profileDateFormat, profileDensity, profileDisplayName, profileLandingPage, profileLocale, profileTimezone]);
 
   async function handleProfileSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
