@@ -67,7 +67,7 @@ export function FunctionalHomePage({
     <div className="functional-home">
       <header className="functional-home-header">
         <nav aria-label="首页导航" className="functional-home-nav">
-          <Link aria-label="WeMail brand lockup" className="functional-home-brand" to="/">
+          <Link className="functional-home-brand" to="/">
             <WemailBrandLockup compact detail={null} label="WeMail brand lockup" />
           </Link>
           <div className="functional-home-nav-links">

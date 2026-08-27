@@ -465,50 +465,34 @@ describe("App", () => {
 
 
   it(
-    "opens the landing mobile menu on demand",
+    "keeps the compact landing navigation functional without mounting a mobile dialog",
     async () => {
       vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("not authenticated"));
       installMatchMedia({ compactNavigation: true, dark: true });
       render(<App />);
 
-      fireEvent.click(await screen.findByRole("button", { name: /切换菜单/i }));
-
-      const dialog = screen.getByRole("dialog", { name: /首页移动菜单/i });
-      expect(dialog).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /切换菜单/i })).toHaveClass(
-        "landing-nav-mobile-toggle",
-        "landing-nav-mobile-toggle-tight"
-      );
-      expect(screen.getByRole("button", { name: /切换菜单/i })).not.toHaveStyle({ transform: "translateY(-1px)" });
-      expect(within(dialog).getByRole("link", { name: /^方案价格$/i })).toHaveAttribute("href", "#pricing");
-      expect(within(dialog).getByRole("link", { name: /登录/i })).toBeInTheDocument();
-      expect(within(dialog).queryByRole("link", { name: /设计系统/i })).toBeInTheDocument();
-      expect(within(dialog).queryByRole("button", { name: /切换到浅色主题|切换到深色主题/i })).toHaveClass("landing-nav-theme-toggle");
-
-      fireEvent.click(within(dialog).getByRole("link", { name: /设计系统/i }));
-
-      await waitFor(() => {
-        expect(window.location.pathname).toBe("/design-system");
-      });
+      const navigation = await screen.findByRole("navigation", { name: /首页导航/i });
+      expect(within(navigation).getByRole("link", { name: /^登录$/i })).toBeInTheDocument();
+      expect(within(navigation).getByRole("link", { name: /^注册$/i })).toBeInTheDocument();
+      expect(screen.queryByRole("dialog", { name: /首页移动菜单/i })).not.toBeInTheDocument();
+      expect(screen.getByRole("link", { name: /^查看邮件$/i })).toHaveAttribute("href", "/login?next=%2Fmail%2Flist");
     },
     10000
   );
 
   it(
-    "shows the console action instead of auth links in the signed-in mobile landing menu",
+    "shows the console action instead of auth links in compact signed-in navigation",
     async () => {
       vi.spyOn(globalThis, "fetch").mockImplementation(mockMemberSessionFetch);
       installMatchMedia({ compactNavigation: true, dark: true });
       render(<App />);
 
-      fireEvent.click(await screen.findByRole("button", { name: /切换菜单/i }));
+      const navigation = await screen.findByRole("navigation", { name: /首页导航/i });
+      expect(within(navigation).queryByRole("link", { name: /^登录$/i })).not.toBeInTheDocument();
+      expect(within(navigation).queryByRole("link", { name: /^注册$/i })).not.toBeInTheDocument();
 
-      const dialog = screen.getByRole("dialog", { name: /首页移动菜单/i });
-      expect(within(dialog).queryByRole("link", { name: /^登录$/i })).not.toBeInTheDocument();
-      expect(within(dialog).queryByRole("link", { name: /^注册$/i })).not.toBeInTheDocument();
-
-      const consoleLink = within(dialog).getByRole("link", { name: /^控制台$/i });
-      expect(consoleLink).toHaveClass("ui-button", "ui-button-primary");
+      const consoleLink = within(navigation).getByRole("link", { name: /^控制台$/i });
+      expect(consoleLink).toHaveClass("functional-home-button", "primary");
       await waitFor(() => {
         expect(consoleLink).toHaveAttribute("href", "/mail/list");
       });
@@ -517,20 +501,21 @@ describe("App", () => {
   );
 
   it(
-    "renders each integration card only once on compact navigation",
+    "renders each functional tool card only once on compact navigation",
     async () => {
       vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("not authenticated"));
       installMatchMedia({ compactNavigation: true, dark: true });
       const { container } = render(<App />);
 
-      await screen.findByRole("heading", { level: 2, name: /和你已经在用的系统自然接上/i });
+      await screen.findByRole("heading", { level: 2, name: /打开页面就能开始工作/i });
 
-      const integrationsSection = container.querySelector("#integrations");
-      expect(integrationsSection).not.toBeNull();
-      expect(integrationsSection?.querySelectorAll(".landing-integration-card")).toHaveLength(12);
-      expect(within(integrationsSection as HTMLElement).getAllByText(/^Cloudflare$/i)).toHaveLength(1);
-      expect(within(integrationsSection as HTMLElement).getAllByText(/^Telegram$/i)).toHaveLength(1);
-      expect(within(integrationsSection as HTMLElement).getAllByText(/^Feature Flags$/i)).toHaveLength(1);
+      const featuresSection = container.querySelector("#features");
+      expect(featuresSection).not.toBeNull();
+      expect(featuresSection?.querySelectorAll(".functional-home-tool")).toHaveLength(4);
+      expect(within(featuresSection as HTMLElement).getAllByText(/^查看邮件$/i)).toHaveLength(1);
+      expect(within(featuresSection as HTMLElement).getAllByText(/^管理邮箱$/i)).toHaveLength(1);
+      expect(within(featuresSection as HTMLElement).getAllByText(/^API 密钥$/i)).toHaveLength(1);
+      expect(within(featuresSection as HTMLElement).getAllByText(/^系统设置$/i)).toHaveLength(1);
     },
     10000
   );
