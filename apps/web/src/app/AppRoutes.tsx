@@ -229,11 +229,11 @@ function WorkspaceRouteFallback() {
       <section aria-hidden="true" className="workspace-route-skeleton-kpis">
         {Array.from({ length: 5 }, (_, index) => (
           <article className={`panel workspace-card workspace-route-skeleton-kpi${index === 0 ? " is-featured" : ""}`} key={index}>
-            <Skeleton animated height={10} rounded="full" width="42%" />
-            <Skeleton animated height={index === 0 ? 46 : 34} rounded="md" width={index === 0 ? "46%" : "38%"} />
-            <Skeleton animated height={12} rounded="full" width="72%" />
-            <Skeleton animated height={12} rounded="full" width="54%" />
-            <Skeleton animated className="workspace-route-skeleton-kpi-mark" height={64} rounded="lg" width={64} />
+            <Skeleton height={10} rounded="full" width="42%" />
+            <Skeleton height={index === 0 ? 46 : 34} rounded="md" width={index === 0 ? "46%" : "38%"} />
+            <Skeleton height={12} rounded="full" width="72%" />
+            <Skeleton height={12} rounded="full" width="54%" />
+            <Skeleton className="workspace-route-skeleton-kpi-mark" height={64} rounded="lg" width={64} />
           </article>
         ))}
       </section>
@@ -241,25 +241,25 @@ function WorkspaceRouteFallback() {
       <section aria-hidden="true" className="workspace-route-skeleton-main">
         <article className="panel workspace-card workspace-route-skeleton-panel workspace-route-skeleton-chart">
           <div className="workspace-route-skeleton-panel-head">
-            <Skeleton animated height={14} rounded="full" width="18%" />
-            <Skeleton animated height={34} rounded="full" width={132} />
+            <Skeleton height={14} rounded="full" width="18%" />
+            <Skeleton height={34} rounded="full" width={132} />
           </div>
           <div className="workspace-route-skeleton-chart-lines">
             {Array.from({ length: 4 }, (_, index) => (
-              <Skeleton animated height={1} key={index} rounded="full" width="100%" />
+              <Skeleton height={1} key={index} rounded="full" width="100%" />
             ))}
           </div>
-          <Skeleton animated className="workspace-route-skeleton-chart-curve" height={112} rounded="lg" width="100%" />
+          <Skeleton className="workspace-route-skeleton-chart-curve" height={112} rounded="lg" width="100%" />
         </article>
 
         <article className="panel workspace-card workspace-route-skeleton-panel workspace-route-skeleton-side">
-          <Skeleton animated height={14} rounded="full" width="34%" />
-          <Skeleton animated height={180} rounded="full" width={180} />
+          <Skeleton height={14} rounded="full" width="34%" />
+          <Skeleton height={180} rounded="full" width={180} />
           <div className="workspace-route-skeleton-list">
             {Array.from({ length: 3 }, (_, index) => (
               <div className="workspace-route-skeleton-list-item" key={index}>
-                <Skeleton animated shape="circle" width={12} />
-                <Skeleton animated height={12} rounded="full" width={`${66 - index * 10}%`} />
+                <Skeleton shape="circle" width={12} />
+                <Skeleton height={12} rounded="full" width={`${66 - index * 10}%`} />
               </div>
             ))}
           </div>
