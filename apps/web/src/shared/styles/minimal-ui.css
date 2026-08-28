@@ -1,0 +1,274 @@
+/* Functional UI mode: a flat, quiet surface for mail and administration workflows. */
+:root {
+  --bg: #ffffff !important;
+  --bg-elevated: #ffffff !important;
+  --surface: #ffffff !important;
+  --surface-strong: #ffffff !important;
+  --surface-muted: #f8fafc !important;
+  --surface-contrast: #111827 !important;
+  --border: #e5e7eb !important;
+  --border-strong: #d1d5db !important;
+  --text: #111827 !important;
+  --text-muted: #4b5563 !important;
+  --text-soft: #6b7280 !important;
+  --accent: #2563eb !important;
+  --accent-strong: #1d4ed8 !important;
+  --accent-soft: #eff6ff !important;
+  --success-soft: #ecfdf5 !important;
+  --warning-soft: #fffbeb !important;
+  --shadow-soft: none !important;
+  --shadow-card: none !important;
+  --shadow-border: none !important;
+  --radius-shell: 12px !important;
+  --radius-card: 12px !important;
+  --radius-pill: 999px !important;
+  --radius-field: 8px !important;
+  --workspace-subcard-radius: 8px !important;
+  --workspace-empty-radius: 8px !important;
+  --transition-fast: none !important;
+  --page-gradient: none !important;
+  --hero-gradient: none !important;
+  --workspace-empty-bg: var(--surface-strong) !important;
+  --button-primary-bg: var(--surface-contrast) !important;
+  --button-primary-bg-hover: var(--surface-contrast) !important;
+  --button-primary-bg-active: var(--surface-contrast) !important;
+  --button-primary-border: var(--surface-contrast) !important;
+  --button-primary-text: var(--bg) !important;
+  --button-primary-shadow: none !important;
+  --button-primary-shadow-hover: none !important;
+  --button-primary-shadow-active: none !important;
+}
+
+:root[data-theme="dark"] {
+  --bg: #0f1115 !important;
+  --bg-elevated: #151922 !important;
+  --surface: #151922 !important;
+  --surface-strong: #1b202b !important;
+  --surface-muted: #11151d !important;
+  --surface-contrast: #f3f4f6 !important;
+  --border: #2b3340 !important;
+  --border-strong: #3b4655 !important;
+  --text: #f3f4f6 !important;
+  --text-muted: #b4bdc9 !important;
+  --text-soft: #8994a3 !important;
+  --accent: #60a5fa !important;
+  --accent-strong: #93c5fd !important;
+  --accent-soft: #172554 !important;
+  --success-soft: #123327 !important;
+  --warning-soft: #3b2b0b !important;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+html {
+  scroll-behavior: auto !important;
+}
+
+body {
+  background: var(--bg) !important;
+  color: var(--text) !important;
+}
+
+/* Remove decorative rendering work; state and focus remain visible through color/borders. */
+*,
+*::before,
+*::after {
+  animation: none !important;
+  transition: none !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+/* Keep keyboard navigation obvious without motion or glow. */
+:focus-visible {
+  outline: 2px solid var(--accent) !important;
+  outline-offset: 2px !important;
+}
+
+button,
+input,
+select,
+textarea {
+  border-radius: 8px !important;
+}
+
+button,
+.ui-button,
+.ui-button-primary,
+.ui-button-secondary,
+.ui-button-danger {
+  background-image: none !important;
+  text-shadow: none !important;
+}
+
+.ui-button-primary {
+  background: var(--surface-contrast) !important;
+  color: var(--bg) !important;
+  border: 1px solid var(--surface-contrast) !important;
+}
+
+.ui-button-secondary,
+.ui-button-text,
+.ui-button-ghost,
+.ui-button-icon,
+.ui-button-icon-only {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border-color: var(--border-strong) !important;
+}
+
+.ui-button-danger {
+  background: #b91c1c !important;
+  color: #ffffff !important;
+  border-color: #b91c1c !important;
+}
+
+input,
+select,
+textarea,
+.form-control-shell,
+.form-control,
+.ui-select,
+.ui-textarea {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border-color: var(--border-strong) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-soft) !important;
+}
+
+.workspace-shell,
+.app-layout,
+.workspace-topbar,
+.workspace-rail-shell,
+.workspace-card,
+.page-panel,
+.panel,
+.ui-table-container,
+.ui-table-state-card,
+.ui-overlay-panel,
+.ui-overlay-drawer,
+.ui-overlay-dialog,
+.functional-home,
+.functional-home-header,
+.functional-home-summary,
+.functional-home-tool {
+  background-image: none !important;
+  background-color: var(--surface) !important;
+  border-color: var(--border) !important;
+}
+
+.workspace-shell,
+.app-layout {
+  background: var(--bg) !important;
+}
+
+.workspace-topbar,
+.workspace-rail-shell {
+  border: 1px solid var(--border) !important;
+}
+
+.workspace-rail-link.active,
+.workspace-mobile-dock-item.active,
+.workspace-pill-link.active {
+  background: var(--accent-soft) !important;
+  color: var(--text) !important;
+}
+
+.workspace-rail-icon-chip,
+.workspace-mobile-dock-item,
+.badge,
+.ui-badge,
+.announcements-chip {
+  box-shadow: none !important;
+}
+
+.ui-overlay-backdrop,
+.ui-overlay-backdrop-drawer {
+  background: rgba(15, 17, 21, 0.42) !important;
+}
+
+.ui-overlay-panel,
+.ui-overlay-drawer,
+.ui-overlay-dialog {
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+}
+
+.ui-table-container {
+  border-radius: 8px !important;
+  overflow: auto;
+}
+
+.ui-table-row,
+.ui-table-row-enter,
+.workspace-route-skeleton,
+.workspace-route-skeleton * {
+  animation: none !important;
+}
+
+.skeleton,
+.ui-skeleton {
+  background: var(--surface-muted) !important;
+}
+
+/* Functional home follows a compact Cal/Linear-like information hierarchy. */
+.functional-home {
+  background: var(--bg) !important;
+}
+
+.functional-home-header {
+  position: sticky !important;
+  top: 0;
+  z-index: 10;
+}
+
+.functional-home-hero {
+  min-height: auto !important;
+  padding: 64px 0 !important;
+}
+
+.functional-home-hero h1,
+.functional-home-section-head h2,
+.functional-home-bottom h2 {
+  font-family: var(--font-sans) !important;
+  font-weight: 650 !important;
+  letter-spacing: -0.04em !important;
+}
+
+.functional-home-hero h1 {
+  font-size: clamp(2.4rem, 5vw, 4.5rem) !important;
+  line-height: 1.05 !important;
+}
+
+.functional-home-summary,
+.functional-home-tool {
+  border-radius: 12px !important;
+}
+
+.functional-home-bottom {
+  border-radius: 12px !important;
+  background: var(--surface-contrast) !important;
+}
+
+.functional-home-footer {
+  border-top: 1px solid var(--border) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
